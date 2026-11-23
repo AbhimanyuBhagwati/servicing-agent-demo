@@ -1,196 +1,352 @@
 # Servicing Agent (demo)
 
-A thin prototype of a design document for a customer-servicing AI agent, for a Salesforce Developer Edition org with Agentforce Builder and Agent Script. The design document is not in this repository: "design/06" and the § numbers below refer to it. In one sentence: **a thin prototype in a Developer Edition org, with the client's systems as stubs that return test data.**
+An AI agent for customer servicing, on Salesforce Agentforce. It answers questions on a technician appointment, on bills and on product policies. When it cannot help, it writes a case for a service rep.
 
-Written 2026-11-23 from the official Agent Script specification, the official recipes, Salesforce's open-source agent skills and the boilerplate that the Salesforce CLI generated. **Status (2026-11-23):** deployed to one Developer Edition org, and run there. The three scenarios below worked in the preview with live actions. The agent is published as Version 1, **not activated**, with no channel. The transcripts, the two problems found in the org and their corrections, and two screenshots are in [`docs/RESULT.md`](docs/RESULT.md).
+This demo is a thin prototype in a Salesforce Developer Edition org. The systems of the client are stubs that give test data. The client is an invented telecom company.
 
-## What the demo shows
+![The Agent Graph of the demo in Agentforce Builder: the Agent Router and seven subagents](docs/screenshots/01_agent_graph_in_builder.jpg)
 
-- **One agent, `Servicing_Agent_Demo`**, in Agent Script. `start_agent` is the Agent Router. It sends each message to one of three jobs (`status`, `account`, `product`), to `person_job` (the list of jobs for persons, a planned exit) or to `handoff` ("I want a person").
-- **The identity first.** A fixed `run` of action 1 sets the customer ID one time in the session, at the start of the first job that needs account data (`status`, `account` or `handoff`). The model never sets it. The router stays a pure router of transitions.
-- **The must-have read first, as a fixed `run`**, in each job, with the customer ID bound from the variable. The outputs go into variables. Then **a fixed branch on the result** builds the instructions for the model. The model does not choose the path for a failure.
-- **The six results of design/06 §5**: `FOUND`, `NOTHING_THERE`, `NOT_AVAILABLE`, `REFUSED`, `NOT_CONFIRMED`, `HELD_BACK`. Each action catches its own errors and returns `NOT_AVAILABLE` with a cause code. No action throws.
-- **The rule for a failure (design/06 §4)** and **the rule for the old value (§6)**: when the live read is down, the agent tells the 02:00 copy as the past, with its time, says what it cannot confirm, and offers a case for a service rep.
-- **The one change**, with a request key, an `available when` guard, and the branches for `REFUSED` and `NOT_CONFIRMED`.
-- **The handoff in its order (design/06 §7)**: the exit cause, the way to a person (action 7), the case written by code (action 8), then the true sentence with the case number. The case carries the record of §8, each fact with its state.
+| Item | Value |
+|---|---|
+| Platform | Salesforce Agentforce, in a Developer Edition org (API version 68.0) |
+| Agent type | Agentforce Service Agent |
+| Agent logic | Agent Script, in one `.agent` file |
+| Actions | 8 Apex invocable actions and 2 shared classes |
+| Tests | 9 Apex test classes and 1 test data factory. The 53 tests passed in the org on 2026-11-23. |
+| Status on 2026-11-23 | Published as Version 1. Not activated. Not connected to a channel. |
+| Data | Test data only. No customer data. |
 
-## Real or stub
+## Contents
 
-| # | Action (Apex class) | Real or stub | The production part that it replaces |
+1. [The jobs of the agent](#1-the-jobs-of-the-agent)
+2. [Five rules of the design](#2-five-rules-of-the-design)
+3. [The architecture](#3-the-architecture)
+4. [The six results](#4-the-six-results)
+5. [The eight actions](#5-the-eight-actions)
+6. [One question, step by step](#6-one-question-step-by-step)
+7. [Three scenarios and the failure paths](#7-three-scenarios-and-the-failure-paths)
+8. [The case for the service rep](#8-the-case-for-the-service-rep)
+9. [Inside Agentforce Builder](#9-inside-agentforce-builder)
+10. [The files](#10-the-files)
+11. [Install the demo in your org](#11-install-the-demo-in-your-org)
+12. [Limits](#12-limits)
+13. [More documents](#13-more-documents)
+
+## 1. The jobs of the agent
+
+The agent has one Agent Router and seven subagents. The router reads the message of the customer and sends it to one subagent. Each subagent does one job.
+
+| The customer writes | Subagent | The agent does this |
+|---|---|---|
+| "When does the technician come?" | Status | It gives the live status of the appointment, with the time of the read. |
+| "Can you move it to Friday at 10?" | Status | It changes the appointment to a free time. It gives a confirmation number. |
+| "What was my last bill?" | Account | It gives the bills from the nightly copy, with the time of that copy. |
+| "What happens to my router if I cancel?" | Product | It gives the approved policy text, with its version and its start date. |
+| "I want to cancel my contract." | Job for persons | Only a service rep does this job. The agent writes a case. |
+| "I want to talk to a person." | Handoff | It writes a case. It gives the case number and the next step. |
+| A question on a different subject | Off Topic | It tells the customer the subjects of the agent. |
+| A question with no clear subject | Ambiguous Question | It tells the customer to give more details. |
+
+## 2. Five rules of the design
+
+The design of the agent has five rules. The code applies each rule.
+
+| # | Rule | Location in the code |
+|---|---|---|
+| 1 | **The identity comes first.** Code sets the customer ID one time in a session. The model cannot set it. | A fixed `run` of action 1 at the start of Status, Account and Handoff |
+| 2 | **Code does each read.** Each Apex action contains one fixed query. The model selects an action, but it writes no query. | The eight Apex classes |
+| 3 | **Each action gives one of six results.** Each action catches its errors. No action stops with an exception. | `ServicingDemoResult`, and a `try` and `catch` in each action |
+| 4 | **A failure goes on a fixed path.** The agent does not guess. It gives the last known fact as the past, with its time. Then it offers a case. | The `NOT_AVAILABLE` and `HELD_BACK` branches in each subagent |
+| 5 | **In a handoff, the case comes first.** Code writes the case before the agent tells the next step to the customer. | A fixed `run` of action 8 in Handoff |
+
+## 3. The architecture
+
+Agent Script is the text that defines the agent. Salesforce compiles it to an Agent Graph. The Atlas Reasoning Engine runs the graph.
+
+In each subagent, fixed steps run the actions in sequence. Then one model step writes the answer from the results. The model does not write the steps for a failure. Code selects the branch from the result of each action.
+
+```mermaid
+flowchart LR
+    M["Message of the<br/>customer"] --> R{{"Agent Router<br/>(start_agent)"}}
+
+    subgraph SA["Subagents"]
+        S["Status"]
+        A["Account"]
+        H["Handoff"]
+        J["Job for persons"]
+        P["Product"]
+        O["Off Topic,<br/>Ambiguous Question"]
+    end
+
+    subgraph AC["Apex actions"]
+        A2["2 Get the appointment status"]
+        A6["6 Change the appointment"]
+        A4["4 Get the open cases"]
+        A3["3 Get the billing history"]
+        A1["1 Get the verified customer"]
+        A7["7 Examine the way to a person"]
+        A8["8 Write the handoff case"]
+        A5["5 Get the policy"]
+    end
+
+    R --> S & A & H & J & P & O
+    J --> H
+    S --> A2 & A6 & A4 & A3 & A1
+    A --> A4 & A3 & A1
+    H --> A1 & A7 & A8
+    P --> A5
+
+    classDef stub fill:#eeeeee,stroke:#777777,color:#222222
+    classDef sf fill:#dff3e4,stroke:#2e7d32,color:#1b3d20
+    class A1,A2,A3,A5,A6,A7 stub
+    class A4,A8 sf
+```
+
+Gray boxes are stubs with test data. Green boxes use records in Salesforce: action 4 reads Case and CaseComment, and action 8 inserts a Case into the case queue. Action 1 also reads one Account: it finds the Account that has the customer ID in its Account Number.
+
+## 4. The six results
+
+Each action gives one result. With the result, it gives five fields: the cause code, the source, the record reference, the time of the data and the time of the read. The next step of the agent comes from the result. The model does not select it.
+
+| Result | Definition | The agent does this |
+|---|---|---|
+| `FOUND` | The source gave a value. | It answers from the value. It gives the time of the value. |
+| `NOTHING_THERE` | The source answered, and it has no record. | It tells the customer that there is no record. From a live source, this is an answer. |
+| `NOT_AVAILABLE` | The source gave no answer, or an error occurred. | It does not guess. It gives the last known fact as the past, with its time. It offers a case. |
+| `REFUSED` | The system did not accept the change. An example is a time that is not free. | It tells the customer that nothing changed. It gives the free times. |
+| `NOT_CONFIRMED` | The agent sent the change, and no confirmation came. | It tells the customer not to book again. It writes a case with the priority High. |
+| `HELD_BACK` | A rule of the design stopped the value. | It does not show the value. It offers a case. |
+
+A rule stops a value in three conditions: no verified customer ID, a row of a different customer, or a copy that is too old.
+
+A cause code is a short code of the design, for example `DEMO_SWITCH_LIVE_READ_DOWN`, `CUSTOMER_MISMATCH` or `COPY_OLDER_THAN_AGE_LIMIT`. A cause code never contains the error text of a different system. That text can contain personal data.
+
+## 5. The eight actions
+
+Six actions are stubs. Two actions use records in Salesforce. Each stub tells, in its first comment, the production part that it replaces.
+
+| # | Action | Apex class | Source in the demo | The production part that it replaces |
+|---|---|---|---|---|
+| 1 | Get the verified customer | `ServicingDemoGetVerifiedCustomer` | Stub: a demo setting, and the Account Number of one Account | User Verification and a linked variable |
+| 2 | Get the appointment status | `ServicingDemoGetAppointmentStatus` | Stub: test data. It gives `NOT_AVAILABLE` when the switch "Live Read Down" is on. | The live read through the interface layer of the client |
+| 3 | Get the billing history | `ServicingDemoGetBillingHistory` | Stub: test rows with the load time 02:00 | Data 360, with Zero Copy query federation to Snowflake |
+| 4 | Get the open cases | `ServicingDemoGetOpenCases` | **Salesforce**: a fixed SOQL query on Case, with public comments only | The same |
+| 5 | Get the policy | `ServicingDemoGetPolicy` | Stub: two policy texts, each with a version and a start date | A retriever on a search index |
+| 6 | Change the appointment | `ServicingDemoChangeAppointment` | Stub with a request key. It gives `NOT_CONFIRMED` when the switch "Change No Reply" is on. | The one write action through the interface layer |
+| 7 | Examine the way to a person | `ServicingDemoCheckWayToPerson` | Stub: always "case only", because this org has no Omni-Channel | Check Availability for Routing, and the hours of the service reps |
+| 8 | Write the handoff case | `ServicingDemoWriteHandoffCase` | **Salesforce**: it inserts a Case into a case queue | The same |
+
+The actions share two classes. `ServicingDemoResult` has the result contract, the time format and the read of the demo settings. `ServicingDemoStubData` has the invented test data of the stubs.
+
+## 6. One question, step by step
+
+The customer writes "When does the technician come?". The Preview panel of Agentforce Builder shows the answer on the left and the trace on the right.
+
+![The preview with the trace: the router, three actions, the answer and the evaluation GROUNDED](docs/screenshots/02_preview_status_with_trace.jpg)
+
+| Step in the trace | Function | Done by |
+|---|---|---|
+| Input | The message of the customer | The customer |
+| Reasoning: Agent Router | It selects the job: Status. | The model |
+| Transition to Subagent: status | It goes to the Status subagent. | The Agent Graph |
+| Action: get verified customer | It sets the customer ID (rule 1). | Code, a fixed step |
+| Action: get appointment status | The live read. The job must have this read, so it is first. | Code, a fixed step |
+| Action: get open cases | A second read, after the first read | Code, a fixed step |
+| Reasoning: Status | It writes the answer from the results only. | The model |
+| Output Evaluation: GROUNDED | The builder marks the answer as grounded. | Salesforce |
+
+The reads go in sequence, not at the same time. Each read starts only when the result before it allows it:
+
+| Condition | The next fixed step |
+|---|---|
+| The identity is not `FOUND` | No read of account data starts. The agent tells the customer to sign in again, and it offers a case. |
+| The live read gives `FOUND` or `NOTHING_THERE` | The case read starts. |
+| The live read gives `NOT_AVAILABLE` | The read of the nightly copy starts, for the old value with its time. The case read does not start. |
+| The live read gives `HELD_BACK` | No other read starts. The agent offers a case. |
+
+## 7. Three scenarios and the failure paths
+
+Two switches in a custom setting change the stubs. With the switches, you can show the failure paths in a live preview.
+
+![The custom setting Servicing Demo Settings, with the switch Live Read Down on](docs/screenshots/08_demo_switches.png)
+
+| Scenario | Switches | The customer writes | The agent does this |
 |---|---|---|---|
-| 1 | Get the verified customer (`ServicingDemoGetVerifiedCustomer`) | Stub: reads a demo setting | User Verification and a linked variable |
-| 2 | Get the appointment status (`ServicingDemoGetAppointmentStatus`) | Stub: test data; "not available" when the demo switch "live read down" is on | The live read through the client's interface layer |
-| 3 | Get the billing history (`ServicingDemoGetBillingHistory`) | Stub: test rows with the load time 02:00 (and the copy of the appointment from the same load) | Data 360, Zero Copy query federation to Snowflake |
-| 4 | Get the open cases (`ServicingDemoGetOpenCases`) | REAL: a fixed SOQL query on Case, only public comments (`CaseComment.IsPublished = true`) | The same |
-| 5 | Get the policy (`ServicingDemoGetPolicy`) | Stub: two policy texts with a version and a start date; "nothing there" for other subjects | The retriever on the search index |
-| 6 | Change the appointment (`ServicingDemoChangeAppointment`) | Stub, with a request key; "not confirmed" when the demo switch "change no reply" is on; "refused" for a time that is not free | The one write action through the interface layer |
-| 7 | Examine the way to a person (`ServicingDemoCheckWayToPerson`) | Stub: returns "case only" (no Omni-Channel in this org) | Check Availability for Routing and the hours |
-| 8 | Write the handoff case (`ServicingDemoWriteHandoffCase`) | REAL: inserts a Case with the record of design/06 §8 in its description | The same |
+| 1. Normal | Both off | "When does the technician come?" Then "Can you move it to Saturday morning?" Then "Then Friday at 10, please." | It gives the live status. Saturday is not free (`REFUSED`), so it gives the free times. Friday is free: it gives a confirmation number `CNF-` and 8 characters. |
+| 2. The live read is down | "Live Read Down" on | "When does the technician come?" Then "Yes, please save a case for a service rep." | It gives the 02:00 value as the past, with its time. It cannot confirm the present status or change it. It writes a case with the priority Medium. |
+| 3. The change gets no reply | "Change No Reply" on | "When does the technician come?" Then "Please move it to Friday at 14:00." | It tells that no confirmation came, and that the appointment is possibly still on Thursday. It tells the customer not to book again. It writes a case with the priority High. |
 
-Two shared classes: `ServicingDemoResult` (the result contract, the time format, the cause code, the read of the demo settings; a helper, no system behind it) and `ServicingDemoStubData` (the invented test data of the stubs). Each class starts with "DEMO STUB: replaces ..." or "REAL".
+Scenario 2 in the preview. The agent tells the old value with its time. Then it saves the case and gives the case number:
 
-All client facts in the stubs are invented [A]: the appointment, the free slots, the bills, the two policy texts, the next step text. Customer IDs 1001 and 1002 only.
+![Scenario 2: the old value with its time, then the case number 00001030](docs/screenshots/05_preview_live_read_down_case.jpg)
 
-## The mapping to design/06
+The agent wrote these words in scenario 2 (from the run on 2026-11-23):
 
-| design/06 | In the demo |
-|---|---|
-| §4 The rule for a failure | The `NOT_AVAILABLE` and `HELD_BACK` branches in `status`, `account` and `product`: no guess; the known fact and its age; what cannot be confirmed; the offer of a case |
-| §5 The six results; the fields with each result | `ServicingDemoResult` and the `Response` class of each action: `resultCode`, `causeCode`, `dataSource`, `recordRef`, `dataTime`, `readTime`, and small typed values |
-| §5 "Each action catches its own error" (R02) | A `try`/`catch` in each action; tests drive each `catch` |
-| §6 Step 1, prove the identity | The fixed `run` of action 1 at the start of `status`, `account` and `handoff`, guarded so that it runs one time in a session |
-| §6 Step 2, find the job | `start_agent agent_router` with `@utils.transition to` for each job |
-| §6 Step 3, get the facts (and the order of the reads in the design's detail of step 3) | Status: the live read, then the cases. Account: the history (one time in a session), then the cases. Product: the policy. A read that the job only uses when available does not start after a must-have read gave `NOT_AVAILABLE` or `HELD_BACK`. The reads run in sequence. |
-| §6 Step 4, answer from the results only | The instruction text of each branch, with the values and the times from the variables |
-| §6 The one action | `change_appointment`, with `available when` (identity proven, the status found, the change switch not off, no change done or pending) |
-| §6 The rule for the old value | After a live read with `NOT_AVAILABLE`: one read of the 02:00 copy, told as the past with its time; no negative fact from the copy; the age limit in action 3 gives `HELD_BACK` |
-| §7 H1 the exit cause | `exit_cause`, set by code in each failure branch; `CUSTOMER_REQUEST` only when the customer asks; `JOB_FOR_PERSONS` in `person_job` |
-| §7 H2 the way to a person | Action 7, before any offer of a person |
-| §7 H3 the case | Action 8, a fixed `run`, before any escalation attempt |
-| §7 H4 the true sentence | The handoff instructions: the case number and the next step text from code |
-| §7 H5a one escalation attempt | A commented line in `handoff`, with its guard. Not active: no Omni-Channel in this org |
-| §7 H6 the case write failed | One more write when no way is open; then the truth and the telephone number on the bill |
-| §8 The record for the service rep | The Case Description: "INTERNAL", the exit cause first, the change, the identity, each source with one of the marks ("found", "nothing there", "could not look" with the cause, "held back" with the cause, "not asked", "old" with its time), the pointer to the conversation, the summary (empty) |
-| §9 End states | Not computed (see "What the demo simplifies") |
-| §12 The switch "the change off" | The variable `change_switch_off` and the `available when` guard |
+> "At 2026-11-23 02:00 EST, our records showed: … I cannot confirm this now, and the present status can be different. I cannot change the appointment now. Would you like me to save your request as a case for a service rep?"
 
-## What the demo simplifies
+**To change the scenario:**
 
-- **H2b, the offer.** The only open way in this org is a case. So the handoff writes the case at once when the customer accepts help, or asks for a person, or the change is not confirmed. In production, with an open way, the customer selects a colleague or a case.
-- **No end states, no session records, no comparison group, no result line events (R44), no entry rule.** The case and the trace of the preview are the only records.
-- **No time limits.** The stubs make no callout, so no Apex time limit is set (R05).
-- **The policy match is a keyword match**, not a search index. The product job has no product catalog read.
-- **The age limit of the copy is a constant (26 hours)** in `ServicingDemoStubData`, not a value of a data platform owner.
-- **The switch "the change off" is a variable default** in the script, not a value that a duty role sets.
-- **The change stores nothing.** After a `FOUND` change, a new session shows the old appointment again.
+1. Open Setup, then Custom Settings, then Servicing Demo Settings, then Manage.
+2. Set the two switches.
+3. Start a new preview session. Each read occurs one time in a session.
 
-## The customer ID: two ways
-
-- **Way A (the script uses it).** Action 1 reads the demo setting `Logged_In_Customer_Id__c` and checks that one Account has that customer ID in its standard field Account Number. The script calls it one time in the session, as a fixed `run` at the start of `status`, `account` or `handoff` (whichever comes first), with `contextCustomerId=""`. The result goes into the mutable variable `customer_id`. No tool lets the model write that variable.
-- **Way B (a test, not used).** The installed CLI preview accepts `--context-variables Name=Value`. To test it: in the three subagents `status`, `account` and `handoff`, change `with contextCustomerId=""` to `with contextCustomerId=@variables.VerifiedCustomerId` (the boilerplate's variable), then start the preview with `--context-variables VerifiedCustomerId=1002`. Action 1 then uses that value, and its output `identityProof` says "way B". Which variables the flag can set is not confirmed [Test]. Way B uses a mutable variable; the design does not accept that for production.
-- **Production.** A linked variable from the verified messaging session (R21): nothing in the agent can assign it. The mapping from the token to the customer record is test T12 of design/06.
-
-## The two ways into the org
-
-### Way 1: the Salesforce CLI (the main path)
-
-Run from the folder `demo/servicing-agent`. The flags marked [to confirm] come from Salesforce's open-source agent skills or long-established CLI use, and not from `--help` in this CLI. Run `sf <command> --help` first.
-
-1. Deploy the custom setting and the Apex classes (with their tests):
-   ```
-   sf project deploy start --source-dir force-app/main/default/objects --source-dir force-app/main/default/classes
-   ```
-2. Optional, the Apex tests with coverage [to confirm the flags]:
-   ```
-   sf apex run test --test-level RunLocalTests --code-coverage --result-format human --wait 10
-   ```
-3. The test data and the org default row of the setting:
-   ```
-   sf apex run --file scripts/apex/create_demo_data.apex
-   ```
-4. Compile the Agent Script against the org (it creates nothing):
-   ```
-   sf agent validate authoring-bundle --api-name Servicing_Agent_Demo
-   ```
-5. Preview the LOCAL bundle with the real Apex actions, with no publish:
-   ```
-   sf agent preview start --authoring-bundle Servicing_Agent_Demo --use-live-actions
-   sf agent preview send --authoring-bundle Servicing_Agent_Demo --session-id <ID from start> -u "When is my technician coming?"
-   sf agent preview end --authoring-bundle Servicing_Agent_Demo --session-id <ID from start>
-   ```
-   [to confirm: the names of `--authoring-bundle` and `--session-id` on `send` and `end`.]
-6. Between scenarios, set the switches and start a NEW preview session (each read happens one time in a session):
-   ```
-   sf apex run --file scripts/apex/scenario_1_normal.apex
-   sf apex run --file scripts/apex/scenario_2_live_read_down.apex
-   sf apex run --file scripts/apex/scenario_3_change_no_reply.apex
-   ```
-7. **The agent user, the queue and the publish.** The preview with live actions and the publish need an agent user: an identity in the org, so create it only in your own org. Deploy the permission set `Servicing_Agent_Demo_Access` (class access for the ten classes; read on Account, Contact and Case; create on Case, with the field permissions that the case write needs) and the case queue, then create the agent user (profile "Einstein Agent User", no password, two permission sets):
-   ```
-   sf project deploy start --source-dir force-app/main/default/permissionsets --source-dir force-app/main/default/queues
-   sf apex run --file scripts/apex/create_agent_user.apex
-   ```
-   The script prints the username (`servicing.demo.agent@<your org ID>.ext`). Put it in place of `REPLACE_WITH_AGENT_USER_USERNAME` in two files: `default_agent_user` in the `.agent` file, and `botUser` in `force-app/main/default/aiAgents/Servicing_Agent_Demo.aiAgentDefinition-meta.xml`. The repository keeps the placeholder, so that no org ID is in it. Then:
-   ```
-   sf agent publish authoring-bundle --api-name Servicing_Agent_Demo
-   ```
-   The publish creates the agent and writes its metadata (`aiAgents/`, `aiAgentDefinitionVersions/`, with the compiled Agent Graph in `agentGraph/`) into this project. Activation (`sf agent activate`) is not done in this demo.
-
-### Way 2: the browser
-
-Setup and the Developer Console, then the Script view of Agentforce Builder. The exact order and the file to paste at each step are in `PASTE_GUIDE.md`.
-
-## The three demo scenarios
-
-Start a new preview session for each scenario. The model writes the words, so the wording changes; the facts and the order must be the ones below. If a fact in the answer is not in the list, that is a finding.
-
-### Scenario 1: the normal status
-
-Settings: customer 1001; "live read down" off; "change no reply" off (`scenario_1_normal.apex`).
-
-| Type | The answer must give |
-|---|---|
-| When is my technician coming? | The visit (a check of the internet line) on the next Thursday, with its date, 14:00-16:00, status Scheduled, named as the **live** status at the time of the read. It can name the open case "Slow internet in the evening" and its public note. It never gives the internal note ("noise on the line"). |
-| Can you move it to Saturday morning? | That time is not free, and nothing changed. The free times: FRI-1000 (Friday 10:00-12:00), FRI-1400 (Friday 14:00-16:00), MON-0800 (Monday 08:00-10:00), with their dates. |
-| Then Friday at 10, please. | The change is complete: a confirmation number `CNF-` and 8 characters, and the new time Friday 10:00-12:00. |
-
-### Scenario 2: the live read is down
-
-Settings: customer 1001; "live read down" **on** (`scenario_2_live_read_down.apex`).
-
-| Type | The answer must give |
-|---|---|
-| When is my technician coming? | Four things: "At [today 02:00], our records showed" the Thursday visit, 14:00-16:00; it cannot confirm that now, and the present status can be different; it cannot change the appointment now; it can save the request as a case for a service rep. No "live" claim, no guess, no promise of a person or of a time for a call. |
-| Yes, please save a case for a service rep. | The request is saved as case [number], with the facts found; the next step: a service rep works on the case from the case queue; keep the case number. It does not say that a person joins the chat. |
-
-Then show the case in Setup (Cases): Subject `Servicing demo handoff: SOURCE_FAILED_LIVE_READ`, Priority Medium, and in the Description: "INTERNAL RECORD FOR THE SERVICE REP"; "4. Live status ...: could not look: DEMO_SWITCH_LIVE_READ_DOWN"; "5b. Appointment in the same nightly copy: old (from the nightly copy of ...)"; "2. Change: not asked"; "6. Open cases ...: not asked" (the case read did not start after the failed must-have read).
-
-### Scenario 3: the change is not confirmed
-
-Settings: customer 1001; "live read down" off; "change no reply" **on** (`scenario_3_change_no_reply.apex`).
-
-| Type | The answer must give |
-|---|---|
-| When is my technician coming? | As in scenario 1. |
-| Please move it to Friday at 14:00. | No offer, code goes to the handoff: the change was sent and no confirmation came; the appointment is possibly still Thursday 14:00-16:00; do not book again; a service rep examines the appointment first; the request is saved as case [number]. It never says that the change is done. |
-
-Then show the case: Priority **High**, Subject `Servicing demo handoff: CHANGE_NOT_CONFIRMED`, and "2. Change: NOT CONFIRMED. Do not book a second time. Examine the appointment first. request key 1001-WO-1001-01:FRI1400; ...; read after the change: ..." [Test: if the transition in the instructions does not fire in the same turn, the customer reads "a service rep will examine the appointment" first, and the case comes with the next message, from `after_reasoning`.]
+You can also run one of the three scripts in `scripts/apex/` (for example `sf apex run --file scripts/apex/scenario_2_live_read_down.apex`).
 
 ### More questions to try
 
-| Type | The answer must give |
+| The customer writes | The agent does this |
 |---|---|
-| What was my last bill? | From our records at [02:00], the nightly copy: the bills, the last one 64.50 USD, Open, with its due date. It says that a payment after that time is not in these records. |
-| What happens to my router if I cancel? | The approved text "Equipment return policy", version 4, valid from 2026-09-01: return within 30 days, with a prepaid label. |
-| Do you sell satellite TV? | "I have no approved policy text for that question", no answer from its own knowledge, the offer of a case. |
-| I want to cancel my contract. | A job for a service rep (planned exit); a case with the exit cause `JOB_FOR_PERSONS`. |
-| I want to talk to a human. | No service rep can take the chat now; the case number; the next step. |
-| (Setting: customer 9999, or empty) When is my technician coming? | No appointment detail and no account detail; sign in again in the app; the offer of a case. |
+| "What was my last bill?" | It gives the bills from the nightly copy, with the time of the copy. The last bill is 64.50 USD, Open, with its due date. It tells that a payment after that time is not in these records. |
+| "What happens to my router if I cancel?" | It gives the approved text "Equipment return policy", version 4, valid from 2026-09-01. |
+| "Do you sell satellite TV?" | It has no approved policy text for that question. It does not answer from its own knowledge. It offers a case. |
+| "I want to cancel my contract." | Only a service rep does this job. The agent writes a case with the exit cause `JOB_FOR_PERSONS`. |
+| "I want to talk to a person." | No service rep can take the chat in this org. It writes a case and gives the case number and the next step. |
+| A test customer that does not exist (setting `9999`) | It gives no appointment and no account details. It tells the customer to sign in again, and it offers a case. |
 
-## Limits: what this demo does not do
+## 8. The case for the service rep
 
-- **No connection** to Snowflake, Data 360, an interface layer of a client, a search index, Enhanced Chat, User Verification or Omni-Channel. Each of those is a stub that returns test data, or is absent. The two real parts are the case read and the case write in Salesforce.
-- **No escalation to a person.** `@utils.escalate` is a commented line; this org has no messaging connection.
-- **No production use, no users, no customers, no deployment, no impact, no measured KPI.** Test data only, in a Developer Edition org.
-- **Nothing is proven by the demo** beyond what the preview shows. The tests of design/06 (T1 to T14) are still open.
-- **Do not say "service agent" for the person.** The person is a service rep; Agentforce Service Agent is the AI.
+The handoff case goes to the queue "Servicing Demo Case Queue". The agent user creates it. The insert sends no automatic email and uses no assignment rule.
 
-## Files
+![The case in the case queue, created by the agent user](docs/screenshots/06_case_in_case_queue.jpg)
+
+Code writes the Description of the case. The text starts with "INTERNAL RECORD FOR THE SERVICE REP". It gives the exit cause first. Then it gives each source with one mark.
+
+![The Description of the case: the exit cause, then each source with its mark](docs/screenshots/07_case_record_for_service_rep.jpg)
+
+| Mark | Definition |
+|---|---|
+| `found` | The source gave the value. |
+| `nothing there` | The source answered, and it has no record. |
+| `could not look` | The source gave no answer. The cause code follows. |
+| `held back` | A rule stopped the value. The cause code follows. |
+| `not asked` | The agent did not read this source in the session. |
+| `old` | The value is from the nightly copy. Its time follows. |
+
+With these marks, the service rep knows which facts are correct now and which facts to examine again.
+
+## 9. Inside Agentforce Builder
+
+The Status subagent in the canvas view. Each `If` line is a fixed branch on a result. Code selects the branch, not the model.
+
+![The Status subagent in the canvas view, with its branches on the results](docs/screenshots/03_status_subagent_canvas.jpg)
+
+The same subagent in the script view. Each action has a `target` that points to an Apex class, for example `apex://ServicingDemoGetVerifiedCustomer`.
+
+![The Status subagent in the script view, with the action definitions](docs/screenshots/04_status_subagent_script.jpg)
+
+## 10. The files
 
 ```
 servicing-agent/
+  README.md                  this file
+  PASTE_GUIDE.md             the path through the browser, with no CLI
   sfdx-project.json
-  README.md, PASTE_GUIDE.md
-  docs/RESULT.md             the run in the org: transcripts, problems and corrections
-  docs/screenshots/          the Agent Graph in the builder; the preview with its trace
+  docs/
+    RESULT.md                the run in the org on 2026-11-23: transcripts, problems, corrections
+    screenshots/             the screenshots in this file
   force-app/main/default/
-    aiAuthoringBundles/Servicing_Agent_Demo/Servicing_Agent_Demo.agent
-    aiAuthoringBundles/Servicing_Agent_Demo/Servicing_Agent_Demo.bundle-meta.xml
-    aiAgents/, aiAgentDefinitionVersions/   written by the publish (Version 1), with the compiled Agent Graph
-    classes/                 10 classes, 10 test classes (9 tests + 1 test data factory), each with -meta.xml
-    objects/Servicing_Demo_Settings__c/   the hierarchy custom setting and its 3 fields
+    aiAuthoringBundles/Servicing_Agent_Demo/
+      Servicing_Agent_Demo.agent             the Agent Script
+      Servicing_Agent_Demo.bundle-meta.xml
+    aiAgents/                                written by the publish (Version 1)
+    aiAgentDefinitionVersions/               written by the publish, with the compiled Agent Graph
+    classes/                                 10 classes, 9 test classes, 1 test data factory
+    objects/Servicing_Demo_Settings__c/      the custom setting with the 3 demo fields
     permissionsets/Servicing_Agent_Demo_Access.permissionset-meta.xml
     queues/Servicing_Demo_Case_Queue.queue-meta.xml
-  scripts/apex/create_demo_data.apex, create_agent_user.apex
-  scripts/apex/scenario_1_normal.apex, scenario_2_live_read_down.apex, scenario_3_change_no_reply.apex
+  scripts/apex/
+    create_demo_data.apex                    the test accounts, contacts, cases and comments
+    create_agent_user.apex                   the agent user, with no password
+    scenario_1_normal.apex
+    scenario_2_live_read_down.apex
+    scenario_3_change_no_reply.apex
 ```
+
+## 11. Install the demo in your org
+
+**You must have:**
+
+| Item | Value |
+|---|---|
+| Salesforce CLI | `sf` version 2.159.7 or later. The `sf agent` commands are part of the CLI. |
+| Org | A Developer Edition org with Agentforce, and the profile "Einstein Agent User" |
+| Permissions | A user that can deploy metadata and create users |
+
+**Caution:** step 4 creates a user in the org. Do this step only in an org that you own.
+
+**Procedure.** Run each command from the root folder of this repository.
+
+1. Log in to your org:
+   ```
+   sf org login web --alias servicing-demo --set-default
+   ```
+2. Deploy the setting, the Apex classes, the permission set and the queue:
+   ```
+   sf project deploy start --source-dir force-app/main/default/objects --source-dir force-app/main/default/classes --source-dir force-app/main/default/permissionsets --source-dir force-app/main/default/queues
+   ```
+3. Create the test data and the default values of the switches:
+   ```
+   sf apex run --file scripts/apex/create_demo_data.apex
+   ```
+4. Create the agent user. The script prints the username in the debug log:
+   ```
+   sf apex run --file scripts/apex/create_agent_user.apex
+   ```
+5. Replace `REPLACE_WITH_AGENT_USER_USERNAME` with the username in two files:
+   - `default_agent_user` in `force-app/main/default/aiAuthoringBundles/Servicing_Agent_Demo/Servicing_Agent_Demo.agent`
+   - `botUser` in `force-app/main/default/aiAgents/Servicing_Agent_Demo.aiAgentDefinition-meta.xml`
+6. Compile the Agent Script against the org. This step creates nothing:
+   ```
+   sf agent validate authoring-bundle --api-name Servicing_Agent_Demo
+   ```
+7. Start a preview with the Apex actions, and send a message:
+   ```
+   sf agent preview start --authoring-bundle Servicing_Agent_Demo --use-live-actions
+   sf agent preview send --authoring-bundle Servicing_Agent_Demo --session-id <ID> -u "When does the technician come?"
+   sf agent preview end --authoring-bundle Servicing_Agent_Demo --session-id <ID>
+   ```
+8. Publish the agent:
+   ```
+   sf agent publish authoring-bundle --api-name Servicing_Agent_Demo
+   ```
+9. Open Agentforce Studio, then Agents, then "Servicing Agent (demo)". Open Preview, then Live Test.
+
+The Live Test operates with no activation. This demo does not activate the agent.
+
+**Optional: run the Apex tests.**
+```
+sf apex run test --test-level RunLocalTests --code-coverage --result-format human --wait 10
+```
+
+Do not deploy all of `force-app` in one command. The folders `aiAgents` and `aiAgentDefinitionVersions` come from the publish. The publish in step 8 creates them again.
+
+To install the demo with no CLI, use the browser path in [`PASTE_GUIDE.md`](PASTE_GUIDE.md).
+
+## 12. Limits
+
+This demo shows the shape of the design on test data. It does not show a production system.
+
+| The demo does not have | The demo uses this |
+|---|---|
+| A connection to Snowflake, to Data 360 or to an interface layer of a client | Stubs with test data |
+| A search index | A keyword match on two policy texts |
+| Enhanced Chat and User Verification | A demo setting that marks one test customer as logged in |
+| Omni-Channel and an escalation to a service rep | A case in a case queue. The line `@utils.escalate` is a comment in the script. |
+| Time limits on the reads | No time limits, because the stubs make no callout |
+| End states, session records and a comparison group | The case and the trace of the preview |
+| A stored change | Nothing: after a change, a new session shows the old appointment again |
+| An age limit from a data owner | A constant of 26 hours in `ServicingDemoStubData` |
+| Users, customers, production use or measured results | Nothing. Test data in a Developer Edition org only. |
+
+In production, a linked variable keeps the verified identity of the session. The connection from that identity to the customer record is not in this demo, and nobody tested it.
+
+## 13. More documents
+
+| Document | Contents |
+|---|---|
+| [`docs/RESULT.md`](docs/RESULT.md) | The run in the org on 2026-11-23: the three transcripts, three problems and their corrections, and the trace |
+| [`PASTE_GUIDE.md`](PASTE_GUIDE.md) | The path through the browser: Setup, the Developer Console and the script view of Agentforce Builder |
+
+---
+
+We wrote this README to the rules of ASD-STE100 Simplified Technical English. It is not a certified STE text.
