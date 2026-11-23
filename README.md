@@ -1,6 +1,6 @@
 # Servicing Agent (demo)
 
-A thin prototype of a design document for a customer-servicing AI agent, for a Salesforce Developer Edition org with Agentforce Builder and Agent Script. The design document is not in this repository: "design/06" and the § numbers below refer to it. Tell the demo as: **"a thin prototype in a Developer Edition org, with the client's systems as stubs that return test data."**
+A thin prototype of a design document for a customer-servicing AI agent, for a Salesforce Developer Edition org with Agentforce Builder and Agent Script. The design document is not in this repository: "design/06" and the § numbers below refer to it. In one sentence: **a thin prototype in a Developer Edition org, with the client's systems as stubs that return test data.**
 
 Written 2026-11-23 from the official Agent Script specification, the official recipes, Salesforce's open-source agent skills and the boilerplate that the Salesforce CLI generated. **Status (2026-11-23):** deployed to one Developer Edition org, and run there. The three scenarios below worked in the preview with live actions. The agent is published as Version 1, **not activated**, with no channel. The transcripts, the two problems found in the org and their corrections, and two screenshots are in [`docs/RESULT.md`](docs/RESULT.md).
 
@@ -156,7 +156,7 @@ Settings: customer 1001; "live read down" off; "change no reply" **on** (`scenar
 
 Then show the case: Priority **High**, Subject `Servicing demo handoff: CHANGE_NOT_CONFIRMED`, and "2. Change: NOT CONFIRMED. Do not book a second time. Examine the appointment first. request key 1001-WO-1001-01:FRI1400; ...; read after the change: ..." [Test: if the transition in the instructions does not fire in the same turn, the customer reads "a service rep will examine the appointment" first, and the case comes with the next message, from `after_reasoning`.]
 
-### More questions, if a panelist asks
+### More questions to try
 
 | Type | The answer must give |
 |---|---|
@@ -167,7 +167,7 @@ Then show the case: Priority **High**, Subject `Servicing demo handoff: CHANGE_N
 | I want to talk to a human. | No service rep can take the chat now; the case number; the next step. |
 | (Setting: customer 9999, or empty) When is my technician coming? | No appointment detail and no account detail; sign in again in the app; the offer of a case. |
 
-## What not to claim
+## Limits: what this demo does not do
 
 - **No connection** to Snowflake, Data 360, an interface layer of a client, a search index, Enhanced Chat, User Verification or Omni-Channel. Each of those is a stub that returns test data, or is absent. The two real parts are the case read and the case write in Salesforce.
 - **No escalation to a person.** `@utils.escalate` is a commented line; this org has no messaging connection.

@@ -64,11 +64,11 @@ Optional: run the tests. Developer Console → **Test** → **New Run** → sele
 
 ## Step 3. Only if an agent user runs the agent: the permission set
 
-Skip this step for the preview. Do it when the agent is published with an agent user (decision B).
+Do this before the preview with live actions: the preview and the published agent run as an agent user, and Salesforce enforces this permission set for it.
 
 Setup → **Permission Sets** → **New** → Label `Servicing Agent Demo Access` → **Save**. Then:
 - **Apex Class Access** → **Edit** → add the ten classes of rows 1 to 10 above → **Save**.
-- **Object Settings**: Accounts: Read; Contacts: Read; Cases: Read and Create. Account field Account Number: Read.
+- **Object Settings**: Accounts: Read; Contacts: Read; Cases: Read and Create. Account field Account Number: Read. Case fields Account, Contact, Description, Origin, Priority, Subject: Read and Edit; Case field Status: Read. Without the Case fields, the case write fails.
 - **Manage Assignments** → add the agent user.
 
 The file `force-app/main/default/permissionsets/Servicing_Agent_Demo_Access.permissionset-meta.xml` is the same permission set for the CLI.
@@ -84,7 +84,7 @@ It creates two test Accounts (Demo Customer A, customer ID 1001; Demo Customer B
 ## Step 5. The agent
 
 1. App Launcher → **Agentforce Studio** → **Agents** → **New Agent**.
-2. The org offers the template **Agentforce Service Agent** (seen in the org on 2026-11-23). A Service Agent runs as an agent user: the creation of that user needs the user's word (decision B). Name: `Servicing Agent (demo)`; API name: `Servicing_Agent_Demo` [to confirm the fields of the dialog].
+2. The org offers the template **Agentforce Service Agent** (seen in the org on 2026-11-23). A Service Agent runs as an agent user, which is an identity in the org: create it only in your own org (`scripts/apex/create_agent_user.apex`). Name: `Servicing Agent (demo)`; API name: `Servicing_Agent_Demo` [to confirm the fields of the dialog].
 3. In Agentforce Builder, switch from **Canvas** to **Script** view.
 4. Select all the script text, and paste the whole content of `force-app/main/default/aiAuthoringBundles/Servicing_Agent_Demo/Servicing_Agent_Demo.agent`. This replaces the subagents of the template (Service Customer Verification, General FAQ, and the others) with the subagents of the demo.
 5. **Keep the builder's own values** in the `config:` block for `developer_name` and `default_agent_user` if they differ from the file. The file has `default_agent_user: "REPLACE_WITH_AGENT_USER_USERNAME"`, a placeholder: put the username of your agent user there (see step 7 of the CLI path in `README.md`).

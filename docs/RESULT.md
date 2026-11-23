@@ -23,7 +23,7 @@ A thin prototype in a Salesforce Developer Edition org. The client's systems are
 
 ## Three problems in the first run, and their corrections
 
-1. **The preview needs an agent user.** The CLI said: "We couldn't find the default agent user NEW AGENT USER." Correction: one agent user, with the user's word.
+1. **The preview needs an agent user.** The CLI said: "We couldn't find the default agent user NEW AGENT USER." Correction: one agent user, created by `scripts/apex/create_agent_user.apex`.
 2. **The case write failed** with `CANNOT_INSERT_UPDATE_ACTIVATE_ENTITY`. The agent told the truth ("not saved, no case number") and gave the telephone path, as the design wants. A debug log of the agent user gave the cause: "fields being inaccessible on Sobject Case … AccountId". Salesforce enforces field security for the agent user. Correction: field permissions in the demo's permission set.
 3. **Two changes that the design wanted anyway:** the case goes to a case queue (not to the agent user), and the insert sends no automatic email and uses no assignment rule.
 
@@ -31,6 +31,6 @@ A thin prototype in a Salesforce Developer Edition org. The client's systems are
 
 In the builder's Preview, the panel "Agent Preview Details" shows each step of one question: Input → Reasoning: Agent Router → Transition to Subagent: status → Action: get verified customer → Action: get appointment status → Action: get open cases → Reasoning: Status → Output Evaluation: GROUNDED. See `screenshots/02_preview_status_with_trace.jpg`.
 
-## What not to claim
+## Limits: what this demo does not do
 
 No connection to Snowflake, Data 360, an interface layer of a client, User Verification, or Omni-Channel. No production use, no users, no impact. The time zone and the times in the answers are from the stubs.
