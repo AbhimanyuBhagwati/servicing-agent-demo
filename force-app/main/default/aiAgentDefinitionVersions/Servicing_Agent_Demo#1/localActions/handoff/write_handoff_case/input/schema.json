@@ -1,0 +1,210 @@
+{
+  "required" : [ ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "casesCause" : {
+      "title" : "Cases Cause",
+      "description" : "Cases Cause",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "casesResult" : {
+      "title" : "Cases Result",
+      "description" : "Cases Result",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "casesValue" : {
+      "title" : "Cases Value",
+      "description" : "Cases Value",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "changeCause" : {
+      "title" : "Change Cause",
+      "description" : "Change Cause",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "changeConfirmation" : {
+      "title" : "Change Confirmation",
+      "description" : "Change Confirmation",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "changeReadAfter" : {
+      "title" : "Change Read After",
+      "description" : "Change Read After",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "changeRequestKey" : {
+      "title" : "Change Request Key",
+      "description" : "Change Request Key",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "changeResult" : {
+      "title" : "Change Result",
+      "description" : "Change Result",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "changeTimeBefore" : {
+      "title" : "Change Time Before",
+      "description" : "Change Time Before",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "changeTimeWanted" : {
+      "title" : "Change Time Wanted",
+      "description" : "Change Time Wanted",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "customerId" : {
+      "title" : "Customer Id",
+      "description" : "Customer Id",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "exitCause" : {
+      "title" : "Exit Cause",
+      "description" : "Exit Cause",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "historyAppointmentCopy" : {
+      "title" : "History Appointment Copy",
+      "description" : "History Appointment Copy",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "historyCause" : {
+      "title" : "History Cause",
+      "description" : "History Cause",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "historyDataTime" : {
+      "title" : "History Data Time",
+      "description" : "History Data Time",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "historyResult" : {
+      "title" : "History Result",
+      "description" : "History Result",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "historyValue" : {
+      "title" : "History Value",
+      "description" : "History Value",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "identityCause" : {
+      "title" : "Identity Cause",
+      "description" : "Identity Cause",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "identityResult" : {
+      "title" : "Identity Result",
+      "description" : "Identity Result",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "policyCause" : {
+      "title" : "Policy Cause",
+      "description" : "Policy Cause",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "policyResult" : {
+      "title" : "Policy Result",
+      "description" : "Policy Result",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "policyValue" : {
+      "title" : "Policy Value",
+      "description" : "Policy Value",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "policyVersion" : {
+      "title" : "Policy Version",
+      "description" : "Policy Version",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "sessionKey" : {
+      "title" : "Session Key",
+      "description" : "Session Key",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "statusCause" : {
+      "title" : "Status Cause",
+      "description" : "Status Cause",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "statusDataTime" : {
+      "title" : "Status Data Time",
+      "description" : "Status Data Time",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "statusResult" : {
+      "title" : "Status Result",
+      "description" : "Status Result",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "statusValue" : {
+      "title" : "Status Value",
+      "description" : "Status Value",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "summaryText" : {
+      "title" : "Summary Text",
+      "description" : "Summary Text",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

@@ -1,0 +1,14 @@
+{
+  "required" : [ "customerId" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "customerId" : {
+      "title" : "Customer Id",
+      "description" : "The verified customer ID of the session",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

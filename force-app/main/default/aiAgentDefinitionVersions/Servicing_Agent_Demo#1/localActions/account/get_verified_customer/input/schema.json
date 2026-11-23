@@ -1,0 +1,21 @@
+{
+  "required" : [ ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "contextCustomerId" : {
+      "title" : "Context Customer Id",
+      "description" : "Way B only (a test): a customer ID from a session variable that the preview sets",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "sessionRef" : {
+      "title" : "Session Ref",
+      "description" : "The messaging session ID, if there is one",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

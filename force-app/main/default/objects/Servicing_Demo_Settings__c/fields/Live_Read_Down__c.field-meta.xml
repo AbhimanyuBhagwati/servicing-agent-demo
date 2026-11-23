@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Live_Read_Down__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>DEMO switch: when checked, the stub of the live read (action 2, Get the appointment status) returns NOT_AVAILABLE, as if the interface layer of the client gave no reply in the time limit.</description>
+    <externalId>false</externalId>
+    <label>Live Read Down</label>
+    <type>Checkbox</type>
+</CustomField>

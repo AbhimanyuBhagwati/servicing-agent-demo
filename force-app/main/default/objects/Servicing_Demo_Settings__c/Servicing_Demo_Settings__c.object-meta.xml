@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <customSettingsType>Hierarchy</customSettingsType>
+    <label>Servicing Demo Settings</label>
+    <description>Demo switches for the Servicing Agent (demo). A presenter changes them in Setup. They show the idea of a switch. Test data only: the logged-in test customer, live read down, change no reply.</description>
+    <visibility>Public</visibility>
+</CustomObject>

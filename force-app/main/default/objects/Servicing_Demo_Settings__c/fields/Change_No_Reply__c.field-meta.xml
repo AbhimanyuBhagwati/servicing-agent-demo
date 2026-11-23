@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Change_No_Reply__c</fullName>
+    <defaultValue>false</defaultValue>
+    <description>DEMO switch: when checked, the stub of the change (action 6, Change the appointment) returns NOT_CONFIRMED, as if the change was sent and no reply came.</description>
+    <externalId>false</externalId>
+    <label>Change No Reply</label>
+    <type>Checkbox</type>
+</CustomField>
