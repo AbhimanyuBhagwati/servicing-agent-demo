@@ -73,24 +73,23 @@ flowchart LR
         S["Status"]
         A["Account"]
         H["Handoff"]
-        J["Job for persons"]
+        J["Job for persons<br/>(to Handoff)"]
         P["Product"]
         O["Off Topic,<br/>Ambiguous Question"]
     end
 
     subgraph AC["Apex actions"]
-        A2["2 Get the appointment status"]
-        A6["6 Change the appointment"]
-        A4["4 Get the open cases"]
-        A3["3 Get the billing history"]
-        A1["1 Get the verified customer"]
-        A7["7 Examine the way to a person"]
-        A8["8 Write the handoff case"]
-        A5["5 Get the policy"]
+        A2["2 Appointment status"]
+        A6["6 Change appointment"]
+        A4["4 Open cases"]
+        A3["3 Billing history"]
+        A1["1 Verified customer"]
+        A7["7 Way to a person"]
+        A8["8 Handoff case"]
+        A5["5 Policy"]
     end
 
     R --> S & A & H & J & P & O
-    J --> H
     S --> A2 & A6 & A4 & A3 & A1
     A --> A4 & A3 & A1
     H --> A1 & A7 & A8
