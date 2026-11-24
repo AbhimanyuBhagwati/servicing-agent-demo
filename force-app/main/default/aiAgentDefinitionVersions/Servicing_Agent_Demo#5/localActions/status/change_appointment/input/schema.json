@@ -1,0 +1,35 @@
+{
+  "required" : [ "customerId", "appointmentId", "wantedSlot", "requestKey" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "appointmentId" : {
+      "title" : "Appointment Id",
+      "description" : "The ID of the present appointment",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "customerId" : {
+      "title" : "Customer Id",
+      "description" : "The verified customer ID of the session",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "requestKey" : {
+      "title" : "Request Key",
+      "description" : "The key of this change request",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "wantedSlot" : {
+      "title" : "Wanted Slot",
+      "description" : "The slot code of a free time, for example FRI-1000, or else the customer's words for the time",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

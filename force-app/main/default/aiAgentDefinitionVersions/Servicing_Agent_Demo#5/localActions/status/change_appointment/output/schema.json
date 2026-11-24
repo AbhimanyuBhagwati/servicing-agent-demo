@@ -1,0 +1,110 @@
+{
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "causeCode" : {
+      "title" : "Cause Code",
+      "description" : "A short cause code",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "confirmationNumber" : {
+      "title" : "Confirmation Number",
+      "description" : "The confirmation of the change",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "dataSource" : {
+      "title" : "Data Source",
+      "description" : "The system that gave the value",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "dataTime" : {
+      "title" : "Data Time",
+      "description" : "The time of the reply",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "freeSlots" : {
+      "title" : "Free Slots",
+      "description" : "The free slots",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "newAppointmentText" : {
+      "title" : "New Appointment Text",
+      "description" : "The appointment after the change",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "readAfterText" : {
+      "title" : "Read After Text",
+      "description" : "What one read showed after a change with no reply",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "readTime" : {
+      "title" : "Read Time",
+      "description" : "The time of the request",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "recordRef" : {
+      "title" : "Record Ref",
+      "description" : "The work order of the appointment",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "requestKeyUsed" : {
+      "title" : "Request Key Used",
+      "description" : "The full key of the request",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "resultCode" : {
+      "title" : "Result Code",
+      "description" : "FOUND, REFUSED, NOT_CONFIRMED, NOT_AVAILABLE or HELD_BACK",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "timeBefore" : {
+      "title" : "Time Before",
+      "description" : "The appointment before the change",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    },
+    "timeWanted" : {
+      "title" : "Time Wanted",
+      "description" : "The slot that the customer wants",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isDisplayable" : false,
+      "copilotAction:isUsedByPlanner" : true
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

@@ -1,10 +1,12 @@
 # Servicing Agent (demo)
 # A thin prototype of design/06_explicit_approach.md in a Developer Edition org.
-# The client's systems are stubs: Apex actions that return test data. Each stub
-# names, in its description, the production part that it replaces.
-# Two actions are REAL: the case read (fixed SOQL, public comments only) and the
-# handoff case write. No connection to Snowflake, Data 360, an interface layer
-# or Omni-Channel. Test data only.
+# Most of the client's systems are stubs: Apex actions that return test data. Each
+# stub names, in its description, the production part that it replaces.
+# Four reads and writes are REAL: the case read (fixed SOQL, public comments only),
+# the handoff case write, the bills from Data 360 (a data stream from a file upload
+# of test data), and the network status through MCP (an outside MCP server with
+# test data, registered in Agentforce Registry). No connection to Snowflake, to a
+# real interface layer or to Omni-Channel. Test data only.
 #
 # The form of this file follows the Agent Script boilerplate that
 # `sf agent generate authoring-bundle --no-spec` wrote for this org (2026-11-23).
@@ -117,6 +119,26 @@ variables:
     policy_value: mutable string = ""
         description: "The approved policy text"
 
+    # ---- The network status: the one read through MCP ----
+    # An outside MCP server (the network operations system, test data) answers it.
+    # It is a read that the job uses when available: a failure removes one fact.
+    network_read_done: mutable boolean = False
+        description: "True after the network status read of this session"
+    network_result: mutable string = ""
+        description: "The result of the network status read: FOUND, NOTHING_THERE, NOT_AVAILABLE or REFUSED"
+    network_cause: mutable string = ""
+        description: "The cause code of the network status read"
+    network_ref: mutable string = ""
+        description: "The outage reference of the network operations system"
+    network_outage_found: mutable boolean = False
+        description: "True when an open outage affects the customer's area"
+    network_value: mutable string = ""
+        description: "The network status in one or two sentences"
+    network_data_time: mutable string = ""
+        description: "When the network operations system last updated the record"
+    network_read_time: mutable string = ""
+        description: "When the network status was read"
+
     # ---- The one action: the change of the appointment ----
     # The switch "the change off" of design/06 section 12. In production it is a
     # value that a duty role sets; in this demo, set the default to True to show it.
@@ -178,6 +200,8 @@ start_agent agent_router:
                 description: "The customer asks about bills, payments, charges, or open cases."
             go_to_product: @utils.transition to @subagent.product
                 description: "The customer asks about a product, a plan, equipment such as a router, or a policy."
+            go_to_network: @utils.transition to @subagent.network
+                description: "The customer asks if there is an outage or a network problem in their area, or says that the internet, broadband or phone service is down or slow."
             go_to_person_job: @utils.transition to @subagent.person_job
                 description: "The request is a job that only a service rep does: to cancel the service, a formal complaint, or a move to a new address."
             go_to_handoff: @utils.transition to @subagent.handoff
@@ -247,7 +271,7 @@ subagent status:
                     description: "The free slots for a change"
             target: "apex://ServicingDemoGetAppointmentStatus"
         get_billing_history:
-            description: "DEMO STUB for Data 360 Zero Copy federation to Snowflake. Gets the bills and the appointment of the verified customer from the nightly copy, with the load time."
+            description: "REAL Data 360 query (data stream Billing History Demo, test data) for the bills of the verified customer, with the time of the data. The appointment copy is a stub. In production: Zero Copy federation to Snowflake."
             inputs:
                 customerId: string
                     description: "The verified customer ID of the session"
@@ -513,7 +537,7 @@ subagent account:
                     description: "How the identity was proven in this demo"
             target: "apex://ServicingDemoGetVerifiedCustomer"
         get_billing_history:
-            description: "DEMO STUB for Data 360 Zero Copy federation to Snowflake. Gets the bills and the appointment of the verified customer from the nightly copy, with the load time."
+            description: "REAL Data 360 query (data stream Billing History Demo, test data) for the bills of the verified customer, with the time of the data. The appointment copy is a stub. In production: Zero Copy federation to Snowflake."
             inputs:
                 customerId: string
                     description: "The verified customer ID of the session"
@@ -611,9 +635,10 @@ subagent account:
                   Tell the customer to sign in again in the app. Offer to save the request as a case for a service rep.
                   If the customer wants that, use {!@actions.go_to_handoff}.
             if @variables.history_result == "FOUND":
-                | From our records at {!@variables.history_data_time} (the nightly copy, not live): {!@variables.history_value}.
+                | From our records at {!@variables.history_data_time} (our copy in Data 360, not live): {!@variables.history_value}.
                   Tell the customer these facts, and say that they are from our records at that time.
                   A payment after that time is not in these records. Do not say that no payment came after that time.
+                  This agent cannot take a payment or show payment options. Do not offer them.
             if @variables.history_result == "NOTHING_THERE":
                 | Our nightly records have no bills for this customer. Do not say that the customer has no bills: a newer bill can be missing from the copy.
                   Tell the customer that you cannot see past bills in our records now, and offer a case with {!@actions.go_to_handoff}.
@@ -699,6 +724,132 @@ subagent product:
                 set @variables.exit_cause = "NO_POLICY"
                 | Tell the customer that you cannot look at the policy texts now. Do not answer from your own knowledge.
                   Offer to save the question as a case for a service rep. If the customer wants that, use {!@actions.go_to_handoff}.
+        actions:
+            go_to_handoff: @utils.transition to @subagent.handoff
+                description: "Use when the customer wants a service rep, a person or a case, or says yes to the offer of a case."
+            go_to_status: @utils.transition to @subagent.status
+                description: "The customer asks about a technician visit or appointment."
+            go_to_account: @utils.transition to @subagent.account
+                description: "The customer asks about bills, payments, charges, or open cases."
+
+
+# The network status: the one read through MCP. An outside MCP server (the network
+# operations system; in this demo a small server with test data, on a tunnel)
+# answers it. The server is registered in Setup > Agentforce Registry, and the
+# registration made the named credential NetworkOperationsDemo.
+# The read is a FIXED step with the customer ID from the variable, so the model
+# never chooses the customer and cannot skip the read. A fixed step needs an Apex
+# action: in this org (tested 2026-11-24) a native MCP action does not run as a
+# fixed `run`, and when the model selected it, it once answered without the read.
+# So the Apex action ServicingDemoCheckNetworkStatus makes the MCP call (tools/call)
+# through that named credential, with its own time limit and a clean result.
+# It is a read that the job uses when available: if it fails, the agent says that
+# it cannot see the network status, and offers a case.
+subagent network:
+    label: "Network status"
+    description: "Answers whether there is an outage or a network problem in the customer's area, from the network operations system, through MCP."
+
+    actions:
+        get_verified_customer:
+            description: "DEMO STUB for User Verification and a linked variable. Returns the customer ID of the test customer that the demo setting marks as logged in."
+            inputs:
+                sessionRef: string
+                    description: "The messaging session ID, if there is one"
+                    is_required: False
+                contextCustomerId: string
+                    description: "Way B only (a test): a customer ID from a session variable that the preview sets"
+                    is_required: False
+            outputs:
+                resultCode: string
+                    description: "FOUND, NOTHING_THERE, NOT_AVAILABLE or HELD_BACK"
+                causeCode: string
+                    description: "A short cause code"
+                dataSource: string
+                    description: "The system that gave the value"
+                recordRef: string
+                    description: "The Account of the customer"
+                dataTime: string
+                    description: "The time of the value"
+                readTime: string
+                    description: "The time of the read"
+                customerId: string
+                    description: "The verified customer ID"
+                identityProof: string
+                    description: "How the identity was proven in this demo"
+            target: "apex://ServicingDemoGetVerifiedCustomer"
+        check_network_status:
+            description: "REAL MCP tools/call to the MCP server NetworkOperationsDemo (a demo server with test data) through its named credential. Reads the network status of the area of the verified customer."
+            inputs:
+                customerId: string
+                    description: "The verified customer ID of the session"
+                    is_required: True
+            outputs:
+                resultCode: string
+                    description: "FOUND, NOTHING_THERE, NOT_AVAILABLE, REFUSED or HELD_BACK"
+                causeCode: string
+                    description: "A short cause code"
+                dataSource: string
+                    description: "The system that gave the value"
+                recordRef: string
+                    description: "The outage reference"
+                dataTime: string
+                    description: "When the network operations system last updated the record"
+                readTime: string
+                    description: "When the network status was read"
+                outageFound: boolean
+                    description: "True when an open outage affects the area of the customer"
+                area: string
+                    description: "The network area of the service of the customer"
+                statusText: string
+                    description: "The facts in one or two sentences"
+            target: "apex://ServicingDemoCheckNetworkStatus"
+
+    reasoning:
+        instructions: ->
+            # Step 1: prove the identity, one time in the session (as in the other jobs).
+            if @variables.identity_checked == False:
+                run @actions.get_verified_customer
+                    with sessionRef=@variables.RoutableId
+                    with contextCustomerId=""
+                    set @variables.customer_id = @outputs.customerId
+                    set @variables.identity_result = @outputs.resultCode
+                    set @variables.identity_cause = @outputs.causeCode
+                    set @variables.identity_checked = True
+            # Step 3: the network read through MCP, a fixed step, one time in the session.
+            if @variables.identity_result == "FOUND" and @variables.network_read_done == False:
+                run @actions.check_network_status
+                    with customerId=@variables.customer_id
+                    set @variables.network_result = @outputs.resultCode
+                    set @variables.network_cause = @outputs.causeCode
+                    set @variables.network_ref = @outputs.recordRef
+                    set @variables.network_outage_found = @outputs.outageFound
+                    set @variables.network_value = @outputs.statusText
+                    set @variables.network_data_time = @outputs.dataTime
+                    set @variables.network_read_time = @outputs.readTime
+                    set @variables.network_read_done = True
+
+            # Step 4, with a fixed branch on each result.
+            | The network read is always for the signed-in customer's own service, never for another person or another customer ID.
+              If the customer asks about another person, a neighbour or another customer ID, say that you can check only their own service, and give the result as theirs.
+              This agent cannot send updates, alerts, text messages or e-mails, and cannot restore the service. Do not offer them.
+            if @variables.identity_result != "FOUND":
+                set @variables.exit_cause = "IDENTITY_NOT_PROVEN"
+                | The login of this customer is not proven. Give no account detail.
+                  Tell the customer to sign in again in the app. Offer to save the request as a case for a service rep.
+                  If the customer wants that, use {!@actions.go_to_handoff}.
+            if @variables.network_result == "FOUND":
+                | Live from the network operations system, read at {!@variables.network_read_time}: {!@variables.network_value}
+                  Tell the customer these facts in plain words. Give the estimated restore time as the read gives it (the day and the time), and say that it is an estimate, not a promise.
+                  Do not give the area code. Do not promise a time.
+            if @variables.network_result == "NOTHING_THERE":
+                | Live from the network operations system, read at {!@variables.network_read_time}: {!@variables.network_value}
+                  Tell the customer that the network system shows no open outage in their area now.
+                  Do not say that the customer's service works: a fault at the customer's address is not in this read.
+                  Offer to save the problem as a case for a service rep. If the customer wants that, use {!@actions.go_to_handoff}.
+            if @variables.network_result == "NOT_AVAILABLE" or @variables.network_result == "REFUSED" or @variables.network_result == "HELD_BACK":
+                set @variables.exit_cause = "SOURCE_FAILED_NETWORK"
+                | Tell the customer: "I cannot see the network status at this time." Do not guess if there is an outage.
+                  Offer to save the problem as a case for a service rep. If the customer wants that, use {!@actions.go_to_handoff}.
         actions:
             go_to_handoff: @utils.transition to @subagent.handoff
                 description: "Use when the customer wants a service rep, a person or a case, or says yes to the offer of a case."

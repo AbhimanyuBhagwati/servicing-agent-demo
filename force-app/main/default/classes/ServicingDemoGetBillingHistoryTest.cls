@@ -1,7 +1,24 @@
 @IsTest
 private class ServicingDemoGetBillingHistoryTest {
 
+    /** Apex tests cannot query Data 360: this fake source gives the stub rows. */
+    private class StubSource implements ServicingDemoBillingSource.Source {
+        public Boolean noStream = false;
+        public List<ServicingDemoStubData.Bill> billsFor(String customerId) {
+            return ServicingDemoStubData.billsFor(customerId);
+        }
+        public Datetime loadTime() {
+            return noStream ? null : ServicingDemoStubData.loadTime();
+        }
+        public String sourceText() {
+            return 'test source';
+        }
+    }
+
     private static ServicingDemoGetBillingHistory.Response callFor(String customerId) {
+        if (ServicingDemoBillingSource.testSource == null) {
+            ServicingDemoBillingSource.testSource = new StubSource();
+        }
         ServicingDemoGetBillingHistory.Request req = new ServicingDemoGetBillingHistory.Request();
         req.customerId = customerId;
         return ServicingDemoGetBillingHistory.getBillingHistory(
@@ -66,6 +83,16 @@ private class ServicingDemoGetBillingHistoryTest {
         System.assertEquals(ServicingDemoResult.NOT_AVAILABLE, res.resultCode);
         System.assertEquals('APEX_DEMOEXCEPTION', res.causeCode);
         System.assertEquals(false, res.appointmentCopyFound);
+    }
+
+    @IsTest
+    static void notAvailableWhenThereIsNoDataStream() {
+        StubSource fake = new StubSource();
+        fake.noStream = true;
+        ServicingDemoBillingSource.testSource = fake;
+        ServicingDemoGetBillingHistory.Response res = callFor('1001');
+        System.assertEquals(ServicingDemoResult.NOT_AVAILABLE, res.resultCode);
+        System.assertEquals('NO_DATA_STREAM', res.causeCode);
     }
 
     @IsTest

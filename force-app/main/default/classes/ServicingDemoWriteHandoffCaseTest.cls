@@ -127,7 +127,7 @@ private class ServicingDemoWriteHandoffCaseTest {
 
         for (String cause : new List<String>{
             'JOB_FOR_PERSONS', 'CUSTOMER_REQUEST', 'SOURCE_FAILED_LIVE_READ', 'SOURCE_FAILED_HISTORY',
-            'NO_POLICY', 'CHANGE_NOT_CONFIRMED', 'IDENTITY_NOT_PROVEN', 'SOMETHING_ELSE'
+            'SOURCE_FAILED_NETWORK', 'NO_POLICY', 'CHANGE_NOT_CONFIRMED', 'IDENTITY_NOT_PROVEN', 'SOMETHING_ELSE'
         }) {
             System.assertNotEquals('', ServicingDemoWriteHandoffCase.exitSentence(cause));
         }

@@ -1,0 +1,33 @@
+{
+  "system": "Network operations system (demo)",
+  "note": "Test data for a demo. It is not a real network. The server moves all times so that the newest update is 20 minutes before the server starts (rebase_to_now).",
+  "rebase_to_now": true,
+  "customers": {
+    "1001": { "area": "NORTH-7", "service": "Fibre broadband" },
+    "1002": { "area": "EAST-2", "service": "Fibre broadband" }
+  },
+  "events": [
+    {
+      "id": "INC-4471",
+      "area": "NORTH-7",
+      "status": "OPEN",
+      "kind": "Fibre cable damaged during roadworks",
+      "impact": "No broadband service in the area",
+      "reported_at": "2026-11-24T08:15:00+00:00",
+      "updated_at": "2026-11-24T09:40:00+00:00",
+      "estimated_restore_at": "2026-11-24T13:30:00+00:00",
+      "crew_on_site": true
+    },
+    {
+      "id": "INC-4398",
+      "area": "EAST-2",
+      "status": "CLOSED",
+      "kind": "Power failure at a street cabinet",
+      "impact": "Slow broadband service in the area",
+      "reported_at": "2026-11-21T18:05:00+00:00",
+      "updated_at": "2026-11-21T21:10:00+00:00",
+      "restored_at": "2026-11-21T21:10:00+00:00",
+      "crew_on_site": false
+    }
+  ]
+}

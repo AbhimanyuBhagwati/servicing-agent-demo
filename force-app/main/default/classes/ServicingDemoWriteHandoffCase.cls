@@ -310,6 +310,9 @@ public with sharing class ServicingDemoWriteHandoffCase {
         if (exitCause == 'SOURCE_FAILED_HISTORY') {
             return 'The read of the bills did not give a usable result.';
         }
+        if (exitCause == 'SOURCE_FAILED_NETWORK') {
+            return 'The read of the network status (the MCP tool of the network operations system) did not give a usable result.';
+        }
         if (exitCause == 'NO_POLICY') {
             return 'No approved policy text for the question of the customer.';
         }

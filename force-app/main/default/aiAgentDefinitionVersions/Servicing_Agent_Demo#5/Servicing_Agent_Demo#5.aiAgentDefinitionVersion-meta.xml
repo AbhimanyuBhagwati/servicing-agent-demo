@@ -1,0 +1,872 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>Runtime condition evaluation for if statements</description>
+        <developerName>AgentScriptInternal_condition_1</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Runtime Condition 1</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>This variable may also be referred to as VerifiedCustomerId</description>
+        <developerName>VerifiedCustomerId</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Verified Customer Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The appointment as the nightly copy showed it</description>
+        <developerName>appointment_copy</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Appointment Copy</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True when the nightly copy has an appointment of this customer</description>
+        <developerName>appointment_copy_found</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Appointment Copy Found</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The ID of the present appointment</description>
+        <developerName>appointment_id</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Appointment Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Number</dataType>
+        <description>The number of case writes in this session (at most 2)</description>
+        <developerName>case_write_attempts</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Case Write Attempts</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause code of the case read</description>
+        <developerName>cases_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Cases Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after the case read of this session</description>
+        <developerName>cases_read_done</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Cases Read Done</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the case read</description>
+        <developerName>cases_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Cases Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The open cases and their last public notes</description>
+        <developerName>cases_value</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Cases Value</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause code of the change</description>
+        <developerName>change_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The confirmation number of the change</description>
+        <developerName>change_confirmation</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Confirmation</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The appointment after the change</description>
+        <developerName>change_new_value</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change New Value</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>What one read showed after a change with no reply</description>
+        <developerName>change_read_after</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Read After</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The request key of the change</description>
+        <developerName>change_request_key</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Request Key</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the change: FOUND, REFUSED, NOT_CONFIRMED, NOT_AVAILABLE or HELD_BACK</description>
+        <developerName>change_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True when changes of appointments are switched off</description>
+        <developerName>change_switch_off</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Switch Off</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The appointment before the change</description>
+        <developerName>change_time_before</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Time Before</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The slot that the customer wanted</description>
+        <developerName>change_time_wanted</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Change Time Wanted</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The verified customer ID of the session. Set only by the fixed run of get_verified_customer.</description>
+        <developerName>customer_id</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Customer Id</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>The one escalation attempt of the session (R09). Not used in this demo.</description>
+        <developerName>escalation_attempt_used</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Escalation Attempt Used</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause of the exit to a person. Set by the script; CUSTOMER_REQUEST only when the customer asks.</description>
+        <developerName>exit_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Exit Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The free slots for a change</description>
+        <developerName>free_slots</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Free Slots</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The case number to tell the customer</description>
+        <developerName>handoff_case_number</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Handoff Case Number</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the case write</description>
+        <developerName>handoff_case_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Handoff Case Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause code of the history read</description>
+        <developerName>history_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>History Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The load time of the nightly copy</description>
+        <developerName>history_data_time</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>History Data Time</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after the one history read of the session</description>
+        <developerName>history_read_done</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>History Read Done</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the history read</description>
+        <developerName>history_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>History Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The bills from the nightly copy</description>
+        <developerName>history_value</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>History Value</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause code of the identity step</description>
+        <developerName>identity_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Identity Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after the one identity step of the session</description>
+        <developerName>identity_checked</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Identity Checked</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the identity step: FOUND, NOTHING_THERE, NOT_AVAILABLE or HELD_BACK</description>
+        <developerName>identity_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Identity Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause code of the network status read</description>
+        <developerName>network_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>When the network operations system last updated the record</description>
+        <developerName>network_data_time</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Data Time</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True when an open outage affects the customer&apos;s area</description>
+        <developerName>network_outage_found</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Outage Found</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after the network status read of this session</description>
+        <developerName>network_read_done</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Read Done</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>When the network status was read</description>
+        <developerName>network_read_time</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Read Time</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The outage reference of the network operations system</description>
+        <developerName>network_ref</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Ref</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the network status read: FOUND, NOTHING_THERE, NOT_AVAILABLE or REFUSED</description>
+        <developerName>network_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The network status in one or two sentences</description>
+        <developerName>network_value</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Network Value</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The true next step, from code</description>
+        <developerName>next_step_text</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Step Text</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause code of the policy read</description>
+        <developerName>policy_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Policy Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The customer message of the last policy read</description>
+        <developerName>policy_question</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Policy Question</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the policy read</description>
+        <developerName>policy_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Policy Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The start date of the approved policy version</description>
+        <developerName>policy_start</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Policy Start</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The title of the approved policy</description>
+        <developerName>policy_title</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Policy Title</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The approved policy text</description>
+        <developerName>policy_value</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Policy Value</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The version of the approved policy</description>
+        <developerName>policy_version</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Policy Version</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True when a service rep can take the chat now. Always False in this demo.</description>
+        <developerName>route_open</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Route Open</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The cause code of the live read</description>
+        <developerName>status_cause</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Status Cause</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The time of the data of the live read</description>
+        <developerName>status_data_time</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Status Data Time</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after the live read of this session</description>
+        <developerName>status_read_done</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Status Read Done</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The time of the live read</description>
+        <developerName>status_read_time</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Status Read Time</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The result of the live read</description>
+        <developerName>status_result</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Status Result</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The appointment from the live read</description>
+        <developerName>status_value</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Status Value</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Boolean</dataType>
+        <description>True after the examination of the way to a person</description>
+        <developerName>way_checked</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Way Checked</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The way to a person: CASE_ONLY in this demo</description>
+        <developerName>way_to_person</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Way To Person</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>Servicing_Agent_Demo_v5</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>Servicing_Agent_Demo_v5</fullName>
+        <agentGraphRef>20Zfj00000CPJGf</agentGraphRef>
+        <description>Demo of a customer-servicing AI agent: appointment status, bills, product policies, and a handoff with a case. Stubs with test data.</description>
+        <localTopicLinks>
+            <genAiPluginName>account</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>ambiguous_question</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>handoff</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>network</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>person_job</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>product</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>status</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answers questions on the customer&apos;s bills and payments, and on the customer&apos;s open cases.</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUH</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUH</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>get_open_cases</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>get_verified_customer</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>get_billing_history</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>REAL Data 360 query (data stream Billing History Demo, test data) for the bills of the verified customer, with the time of the data. The appointment copy is a stub. In production: Zero Copy federation to Snowflake.</description>
+                <invocationTarget>ServicingDemoGetBillingHistory</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_billing_history</localDeveloperName>
+                <masterLabel>Get Billing History</masterLabel>
+            </localActions>
+            <localActions>
+                <description>REAL fixed query on Case for the verified customer. Gets the open cases and only their public comments.</description>
+                <invocationTarget>ServicingDemoGetOpenCases</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_open_cases</localDeveloperName>
+                <masterLabel>Get Open Cases</masterLabel>
+            </localActions>
+            <localActions>
+                <description>DEMO STUB for User Verification and a linked variable. Returns the customer ID of the test customer that the demo setting marks as logged in.</description>
+                <invocationTarget>ServicingDemoGetVerifiedCustomer</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_verified_customer</localDeveloperName>
+                <masterLabel>Get Verified Customer</masterLabel>
+            </localActions>
+            <localDeveloperName>account</localDeveloperName>
+            <masterLabel>Account</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Welcome the user and determine the appropriate subagent based on user input</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUF</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUF</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect conversation to relevant topics when user request is too ambiguous</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUA</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUA</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>ambiguous_question</localDeveloperName>
+            <masterLabel>Ambiguous Question</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Passes the customer to a service rep: examines the way to a person, saves a case with the known facts, and tells the true next step.</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUB</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUB</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>check_way_to_person</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>get_verified_customer</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>write_handoff_case</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>DEMO STUB for Check Availability for Routing and the service hours. Returns case only in this org.</description>
+                <invocationTarget>ServicingDemoCheckWayToPerson</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>check_way_to_person</localDeveloperName>
+                <masterLabel>Check Way To Person</masterLabel>
+            </localActions>
+            <localActions>
+                <description>DEMO STUB for User Verification and a linked variable. Returns the customer ID of the test customer that the demo setting marks as logged in.</description>
+                <invocationTarget>ServicingDemoGetVerifiedCustomer</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_verified_customer</localDeveloperName>
+                <masterLabel>Get Verified Customer</masterLabel>
+            </localActions>
+            <localActions>
+                <description>REAL insert of one Case for the handoff, with the known facts of the session and the state of each fact.</description>
+                <invocationTarget>ServicingDemoWriteHandoffCase</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>write_handoff_case</localDeveloperName>
+                <masterLabel>Write Handoff Case</masterLabel>
+            </localActions>
+            <localDeveloperName>handoff</localDeveloperName>
+            <masterLabel>Handoff</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answers whether there is an outage or a network problem in the customer&apos;s area, from the network operations system, through MCP.</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUE</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUE</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>check_network_status</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>get_verified_customer</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>REAL MCP tools/call to the MCP server NetworkOperationsDemo (a demo server with test data) through its named credential. Reads the network status of the area of the verified customer.</description>
+                <invocationTarget>ServicingDemoCheckNetworkStatus</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>check_network_status</localDeveloperName>
+                <masterLabel>Check Network Status</masterLabel>
+            </localActions>
+            <localActions>
+                <description>DEMO STUB for User Verification and a linked variable. Returns the customer ID of the test customer that the demo setting marks as logged in.</description>
+                <invocationTarget>ServicingDemoGetVerifiedCustomer</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_verified_customer</localDeveloperName>
+                <masterLabel>Get Verified Customer</masterLabel>
+            </localActions>
+            <localDeveloperName>network</localDeveloperName>
+            <masterLabel>Network status</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect conversation to relevant topics when user request goes off-topic</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUC</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUC</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>The request is a job that only a service rep does: to cancel the service, a formal complaint, or a move to a new address.</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUG</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUG</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>person_job</localDeveloperName>
+            <masterLabel>Job for persons</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answers questions on products, plans and equipment, only from approved policy texts.</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utUD</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utUD</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>get_policy</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>DEMO STUB for the retriever on the search index. Gets one approved policy text with its version and start date, or NOTHING_THERE.</description>
+                <invocationTarget>ServicingDemoGetPolicy</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_policy</localDeveloperName>
+                <masterLabel>Get Policy</masterLabel>
+            </localActions>
+            <localDeveloperName>product</localDeveloperName>
+            <masterLabel>Product</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answers questions on the status of the customer&apos;s technician appointment, and changes the appointment to a free time.</description>
+            <genAiPluginInstructions>
+                <description>You are the AI agent of a telecom company, in a demo with test data. You help customers with three jobs: the status of a technician appointment, bills and payments, and questions on products and policies.
+Be short, calm and polite. Use plain words. Ask one question at a time.
+Tell the customer only facts that an action gave in this conversation. Never promise a fact, a time or a result that you did not find. Never guess.
+Name the age of each fact: say &quot;live, at&quot; and the time for a live read, and &quot;from our records at&quot; and the time for the nightly copy.
+Never show record IDs, cause codes or internal notes to the customer.</description>
+                <developerName>instruction0_179fj000004utU9</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004utU9</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>get_verified_customer</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>get_open_cases</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>change_appointment</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>get_appointment_status</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>get_billing_history</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>DEMO STUB for the one write action through the client&apos;s interface layer. Changes the technician appointment to one free slot, with a request key.</description>
+                <invocationTarget>ServicingDemoChangeAppointment</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>change_appointment</localDeveloperName>
+                <masterLabel>Change Appointment</masterLabel>
+            </localActions>
+            <localActions>
+                <description>DEMO STUB for the live read through the client&apos;s interface layer. Gets the present technician appointment of the verified customer.</description>
+                <invocationTarget>ServicingDemoGetAppointmentStatus</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_appointment_status</localDeveloperName>
+                <masterLabel>Get Appointment Status</masterLabel>
+            </localActions>
+            <localActions>
+                <description>REAL Data 360 query (data stream Billing History Demo, test data) for the bills of the verified customer, with the time of the data. The appointment copy is a stub. In production: Zero Copy federation to Snowflake.</description>
+                <invocationTarget>ServicingDemoGetBillingHistory</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_billing_history</localDeveloperName>
+                <masterLabel>Get Billing History</masterLabel>
+            </localActions>
+            <localActions>
+                <description>REAL fixed query on Case for the verified customer. Gets the open cases and only their public comments.</description>
+                <invocationTarget>ServicingDemoGetOpenCases</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_open_cases</localDeveloperName>
+                <masterLabel>Get Open Cases</masterLabel>
+            </localActions>
+            <localActions>
+                <description>DEMO STUB for User Verification and a linked variable. Returns the customer ID of the test customer that the demo setting marks as logged in.</description>
+                <invocationTarget>ServicingDemoGetVerifiedCustomer</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>get_verified_customer</localDeveloperName>
+                <masterLabel>Get Verified Customer</masterLabel>
+            </localActions>
+            <localDeveloperName>status</localDeveloperName>
+            <masterLabel>Status</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>Servicing Agent (demo)</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>5</version>
+    <welcomeMessage>Hello. I am the AI agent of this demo, with test data only. I can help with your technician appointment, your bills, and our product policies.</welcomeMessage>
+</AiAgentDefinitionVersion>

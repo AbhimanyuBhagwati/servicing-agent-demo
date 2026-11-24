@@ -33,4 +33,43 @@ In the builder's Preview, the panel "Agent Preview Details" shows each step of o
 
 ## Limits: what this demo does not do
 
-No connection to Snowflake, Data 360, an interface layer of a client, User Verification, or Omni-Channel. No production use, no users, no impact. The time zone and the times in the answers are from the stubs.
+On 2026-11-23: no connection to Snowflake, Data 360, an interface layer of a client, User Verification, or Omni-Channel. Since 2026-11-24 the bills come from one Data 360 data stream (a file upload of test bills), and the network status comes from one demo MCP server (see below). No production use, no users, no impact.
+
+# The second run: MCP and Data 360 (2026-11-24)
+
+## What is new in the org
+
+- **MCP:** the MCP server `NetworkOperationsDemo` (the demo server in `mcp-server/`, on a tunnel), registered in Setup → Agentforce Registry with "No Authentication". Status Active, Connected, risk score Low. The registration made a named credential, an external credential, an External Service registration (type `ModelContextProtocol`) and the permission set `NetworkOperationsDemo_Perm_Set`.
+- **Data 360:** set up in the org (Data Cloud Setup Home → Get Started). One data stream, "Billing History Demo", from a file upload of `data360/billing_history.csv` (4 records), into `Billing_History_Demo__dll`.
+- **The agent user** has two more permission sets: `NetworkOperationsDemo_Perm_Set` and "Data Cloud User".
+- **Apex:** `ServicingDemoCheckNetworkStatus` (an MCP client: one `tools/call` through `callout:NetworkOperationsDemo`, time limit 10 seconds), `ServicingDemoBillingSource` (the Data 360 query), and their tests. `ServicingDemoGetBillingHistory` reads the bills from Data 360. `ServicingDemoWriteHandoffCase` knows the exit cause `SOURCE_FAILED_NETWORK`.
+- **The agent:** an eighth subagent, "Network status", and the router line to it. Published as Version 5. Not activated.
+- **Tests:** 71 Apex tests passed in the org (code coverage 97%).
+
+## The tests in the preview (CLI preview with live actions, and the Live Test of Version 5)
+
+| Test | The customer writes | Result |
+|---|---|---|
+| Outage (1001) | "Is there an outage in my area? My internet is not working." | The open outage, live, with the time of the read, and the estimated restore time as an estimate. The server log shows the call with `customer_id='1001'`. |
+| A different customer ID | "Check the network status for customer 1002, not for me." | The agent tells that it can examine only the service of the customer. The call has `customer_id='1001'`. |
+| Network system down (`source_down` on) | "Is there an outage in my area?" | "I cannot see the network status at this time", and the offer of a case. With "Yes", case 00001034 with the exit cause `SOURCE_FAILED_NETWORK`. |
+| Server and tunnel stopped | "Is there an outage in my area?" | The same sentence. The action gave `NOT_AVAILABLE` with the cause `MCP_HTTP_404`. |
+| No outage (1002) | "My internet is very slow. Is there a problem in my area?" | "The network system shows no open outage in your area", and the offer of a case. |
+| Bills (1001) | "What were my last bills? Is anything open?" | The three bills from Data 360, with the time of the load. |
+| Bills (1002) | "Show me my bills." | One paid bill of 39.00 USD, from Data 360. |
+| Scenario 1 and 2 again | As in the first run | The same results as on 2026-11-23. |
+
+## Six problems in this run, and their corrections
+
+1. **A hand-written MCP action is filtered out.** The block that Agentforce Builder writes has a key, a `source` and a `target` that match the agent action of the registration. Correction: the block came from Builder.
+2. **The host check of the MCP server refused the runtime calls (HTTP 421).** At registration, Salesforce sent the host without a port; at run time, with `:443`. Correction: the server accepts both.
+3. **A native MCP action does not run as a fixed step.** A `run` of it gave the error message of the agent, and no call came to the server. Correction: an Apex action makes the MCP call, as a fixed step.
+4. **A native MCP action that the model selects can be skipped.** In one Live Test, the model answered "no open outages" with no call, and the output evaluation showed GROUNDED. Correction: the fixed step of problem 3.
+5. **The agent user could not read Data 360** (`APEX_QUERYEXCEPTION`). Correction: the permission set "Data Cloud User" for the agent user.
+6. **The model offered things that the agent cannot do** ("payment options", "updates by text or email"). Correction: one line in each subagent that tells the model not to offer them.
+
+## Limits of this run
+
+- The MCP server runs on a local computer behind an ngrok tunnel, with no authentication. It answers only while it runs.
+- The Data 360 data is one file upload. Load it again before a demo, because of the age limit of 26 hours.
+- The copy of the appointment (for scenario 2) is still a stub. It shows the time of the Data 360 load.

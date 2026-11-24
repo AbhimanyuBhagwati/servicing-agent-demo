@@ -1,29 +1,28 @@
 /**
- * DEMO STUB: replaces Data 360 Zero Copy query federation to Snowflake.
- *
  * Action 3 of the demo specification, "Get the billing history".
- * It returns test rows from ServicingDemoStubData with the load time 02:00
- * (the nightly copy). It also returns the copy of the appointment from the
- * same load, for the rule for the old value of design/06 section 6: after a
- * live read with the result NOT_AVAILABLE, the AI agent can tell this value
- * as the past, with its time. The value and the time come from this result,
- * and not from the model.
  *
- * In production this is an action with a fixed query on a Data 360 data model
- * object, federated to Snowflake with the filter on the customer ID pushed
- * down. This demo reads no Data 360 and no Snowflake.
+ * The bills are REAL Data 360 data: a fixed query on the data lake object of the
+ * data stream "Billing History Demo" (a file upload of a billing export, test
+ * data; see ServicingDemoBillingSource). The time of the data is the last refresh
+ * of that data stream. In production the same object is federated to Snowflake
+ * (Zero Copy); this demo has no Snowflake.
  *
- * Two rules of ours give HELD_BACK: the age limit (a load older than
+ * The copy of the appointment is still a STUB (ServicingDemoStubData). It serves
+ * the rule for the old value of design/06 section 6: after a live read with the
+ * result NOT_AVAILABLE, the AI agent can tell this value as the past, with its
+ * time. The value and the time come from this result, and not from the model.
+ *
+ * Two rules of ours give HELD_BACK: the age limit (data older than
  * COPY_AGE_LIMIT_HOURS; in production the data platform owner sets it) and the
  * customer examination (a row of a different customer).
  *
  * Results: FOUND; NOTHING_THERE (no bills in the copy; the AI agent gives no
- * negative fact from the copy); NOT_AVAILABLE (an error, caught; never thrown,
- * R02); HELD_BACK.
+ * negative fact from the copy); NOT_AVAILABLE (an error or no data stream, caught;
+ * never thrown, R02); HELD_BACK.
  */
 public with sharing class ServicingDemoGetBillingHistory {
 
-    public static final String SOURCE_TEXT = 'DEMO STUB for Data 360 Zero Copy federation to Snowflake (nightly copy)';
+    public static final String SOURCE_TEXT = ServicingDemoBillingSource.SOURCE_TEXT;
 
     @TestVisible
     static Boolean forceError = false;
@@ -60,7 +59,7 @@ public with sharing class ServicingDemoGetBillingHistory {
 
     @InvocableMethod(
         label='Servicing Demo: Get the billing history'
-        description='DEMO STUB for Data 360 Zero Copy federation to Snowflake. Returns the bills and the appointment of the verified customer as the nightly copy showed them, with the load time.'
+        description='REAL Data 360 query (data stream Billing History Demo, test data) for the bills of the verified customer, with the time of the data. The appointment copy is a stub. In production: Zero Copy federation to Snowflake.'
     )
     public static List<Response> getBillingHistory(List<Request> requests) {
         List<Response> responses = new List<Response>();
@@ -75,7 +74,8 @@ public with sharing class ServicingDemoGetBillingHistory {
 
     private static Response evaluate(Request req) {
         Response res = new Response();
-        res.dataSource = SOURCE_TEXT;
+        ServicingDemoBillingSource.Source source = ServicingDemoBillingSource.current();
+        res.dataSource = source.sourceText();
         res.readTime = ServicingDemoResult.nowText();
         try {
             if (forceError) {
@@ -88,7 +88,12 @@ public with sharing class ServicingDemoGetBillingHistory {
                 return res;
             }
 
-            Datetime loadAt = ServicingDemoStubData.loadTime();
+            Datetime loadAt = source.loadTime();
+            if (loadAt == null) {
+                res.resultCode = ServicingDemoResult.NOT_AVAILABLE;
+                res.causeCode = 'NO_DATA_STREAM';
+                return res;
+            }
             res.dataTime = ServicingDemoResult.timeText(loadAt);
             Long ageHours = (Datetime.now().getTime() - loadAt.getTime()) / 3600000L;
             if (ageHours > ServicingDemoStubData.COPY_AGE_LIMIT_HOURS) {
@@ -97,7 +102,7 @@ public with sharing class ServicingDemoGetBillingHistory {
                 return res;
             }
 
-            List<ServicingDemoStubData.Bill> bills = ServicingDemoStubData.billsFor(customerId);
+            List<ServicingDemoStubData.Bill> bills = source.billsFor(customerId);
             ServicingDemoStubData.Appointment copyRow = ServicingDemoStubData.appointmentFor(customerId);
 
             // The customer examination: every row must carry the customer ID of the session.
@@ -137,7 +142,7 @@ public with sharing class ServicingDemoGetBillingHistory {
             res.lastBillStatus = lastBill.status;
         } catch (Exception e) {
             res = new Response();
-            res.dataSource = SOURCE_TEXT;
+            res.dataSource = source.sourceText();
             res.readTime = ServicingDemoResult.nowText();
             res.resultCode = ServicingDemoResult.NOT_AVAILABLE;
             res.causeCode = ServicingDemoResult.causeFrom(e);

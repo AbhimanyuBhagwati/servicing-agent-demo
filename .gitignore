@@ -3,3 +3,9 @@
 node_modules/
 .DS_Store
 *.log
+
+# MCP demo server: local environment, secret path, logs
+mcp-server/.venv/
+mcp-server/.local/
+mcp-server/logs/
+__pycache__/

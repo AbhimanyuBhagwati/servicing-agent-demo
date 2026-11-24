@@ -1,0 +1,5 @@
+bill_id,customer_id,bill_period,amount,currency,bill_status,due_date,source_system
+B-1001-2026-09,1001,2026-09,49.00,USD,Paid,,Billing system (demo export)
+B-1001-2026-10,1001,2026-10,49.00,USD,Paid,,Billing system (demo export)
+B-1001-2026-11,1001,2026-11,64.50,USD,Open,2026-12-05,Billing system (demo export)
+B-1002-2026-11,1002,2026-11,39.00,USD,Paid,,Billing system (demo export)

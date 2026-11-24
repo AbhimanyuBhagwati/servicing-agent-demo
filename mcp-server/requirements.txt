@@ -1,0 +1,2 @@
+# The official MCP Python SDK, 1.x (protocol versions 2024-11-05 to 2025-11-25).
+mcp>=1.30,<2
