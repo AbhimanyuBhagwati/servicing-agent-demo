@@ -161,9 +161,11 @@ Version 5 (2026-11-24) adds two connections that are not stubs. Each connection 
 The customer writes "Is there an outage in my area?". The router sends the message to the subagent Network status. That subagent does two fixed steps: it proves the identity (action 1), and then it reads the network status (action 9).
 
 ```mermaid
-flowchart LR
-    A9["Action 9<br/>(Apex, fixed step)"] -- "MCP tools/call<br/>JSON-RPC over HTTPS" --> NC["Named credential<br/>NetworkOperationsDemo"]
-    NC --> T["ngrok tunnel"] --> M["MCP server<br/>network-operations-demo"] --> F[("Test data:<br/>network_events.json")]
+flowchart TB
+    A9["Action 9 (Apex, fixed step)"] -- "MCP tools/call, JSON-RPC over HTTPS" --> NC["Named credential NetworkOperationsDemo"]
+    NC --> T["ngrok tunnel"]
+    T --> M["MCP server network-operations-demo"]
+    M --> F[("Test data: network_events.json")]
 ```
 
 | Part | Description |
