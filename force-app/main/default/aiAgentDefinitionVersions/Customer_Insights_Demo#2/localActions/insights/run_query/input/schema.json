@@ -1,0 +1,21 @@
+{
+  "required" : [ "sqlQuery" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "question" : {
+      "title" : "Question",
+      "description" : "The question of the user, in words",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    },
+    "sqlQuery" : {
+      "title" : "Sql Query",
+      "description" : "One Data 360 SQL SELECT statement on the eight Insights tables",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

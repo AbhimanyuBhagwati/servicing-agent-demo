@@ -34,6 +34,7 @@ This demo is a thin prototype in a Salesforce Developer Edition org. The client 
 12. [Install the demo in your org](#12-install-the-demo-in-your-org)
 13. [Limits](#13-limits)
 14. [More documents](#14-more-documents)
+15. [A second agent: Customer Insights](#15-a-second-agent-customer-insights)
 
 ## 1. The jobs of the agent
 
@@ -454,6 +455,25 @@ In production, a linked variable keeps the verified identity of the session. The
 | [`mcp-server/README.md`](mcp-server/README.md) | The MCP server: its tool, its results, its switches, and the procedures to run it and to register it |
 | [`data360/README.md`](data360/README.md) | The Data 360 data stream: the procedures to create it and to load it again |
 | [`PASTE_GUIDE.md`](PASTE_GUIDE.md) | The path through the browser: Setup, the Developer Console and the script view of Agentforce Builder |
+| [`data360/insights/README.md`](data360/insights/README.md) | The data of the second agent: eight source tables for 10 invented customers |
+
+## 15. A second agent: Customer Insights
+
+The org has a second agent, **Customer Insights (demo)**. It is an employee agent (`AgentforceEmployeeAgent`): a person on the staff of a store asks questions about 10 invented customers. It operates as the logged-in user, so it has no agent user. Published as Version 2. Not activated.
+
+![Customer Insights in Live Test: the list of returns, and the trace with the action "run query"](docs/screenshots/17_customer_insights_live_test.jpg)
+
+| Item | Value |
+|---|---|
+| Data | Eight Data 360 data streams (file uploads of invented data). Each stands for one system of a store: CRM, product catalog, web shop (orders, order lines), help desk, warehouse returns, review site, survey tool. See [`data360/insights/README.md`](data360/insights/README.md). |
+| Agent logic | `aiAuthoringBundles/Customer_Insights_Demo/Customer_Insights_Demo.agent`: one Agent Router, one subagent "Customer Insights", the eight tables and the SQL rules in its instructions |
+| Actions | `InsightsRunQuery`: the model writes one Data 360 SQL `SELECT`; the action runs it (read only, the eight tables only, at most 200 rows) and gives back the rows, the source systems and the SQL. `InsightsCustomerOverview`: seven fixed queries for one customer. `InsightsListSources`: the tables, row counts and load times. |
+| Tests | `InsightsDemoTest`, 13 tests with a fake Data 360 runner |
+| Permission set | `Customer_Insights_Demo_Access`, for each employee who uses the agent |
+
+Example questions: "Show me all the issues reported by customer 1." "Has any customer filed a return?" "Which carrier causes the most late deliveries?" "Who bought the coffee machine but never bought coffee pods?" "Which customers are at risk of leaving us?"
+
+**Limit.** The model writes the SQL, so an answer can be wrong. In the tests, six problems came up (a guessed product name, rows that multiplied in a join, unclear definitions of spend, late and risk). The instructions now hold the product list, the definitions and an example of a count across tables. The tests do not prove that each new question gives a correct answer.
 
 ---
 

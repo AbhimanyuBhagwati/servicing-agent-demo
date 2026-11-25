@@ -1,0 +1,9 @@
+return_id,order_id,customer_id,product_id,requested_date,return_reason,return_status,refund_amount,source_system
+R01,O1003,C01,P07,2026-06-11,Battery does not charge,Refunded,59.00,Warehouse returns system
+R02,O1007,C02,P07,2026-05-13,Keeps disconnecting,Refunded,59.00,Warehouse returns system
+R03,O1015,C04,P07,2026-04-22,Stopped working,Pending,,Warehouse returns system
+R04,O1025,C07,P07,2026-08-06,Sound only in one ear,Refunded,59.00,Warehouse returns system
+R05,O1029,C08,P02,2026-08-21,Wrong size,Refunded,120.00,Warehouse returns system
+R06,O1030,C09,P05,2026-09-15,Changed my mind,Rejected,0.00,Warehouse returns system
+R07,O1031,C09,P07,2026-09-03,Will not charge,Pending,,Warehouse returns system
+R08,O1037,C10,P06,2026-11-05,Arrived damaged,Pending,,Warehouse returns system

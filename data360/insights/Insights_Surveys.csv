@@ -1,0 +1,9 @@
+response_id,customer_id,response_date,nps_score,survey_comment,source_system
+S01,C01,2026-10-20,9,Fast help when my earbuds failed.,Survey tool
+S02,C02,2026-07-01,7,"Delivery is slow, but support is good.",Survey tool
+S03,C03,2026-09-10,8,Good products.,Survey tool
+S04,C04,2026-07-15,2,Still no refund after months.,Survey tool
+S05,C06,2026-10-02,10,Love the coffee machine and the help.,Survey tool
+S06,C08,2026-09-05,8,Easy exchange.,Survey tool
+S07,C09,2026-09-25,0,Refund refused and the earbuds are broken.,Survey tool
+S08,C10,2026-11-21,5,"I like the store, but the TV problem takes too long.",Survey tool

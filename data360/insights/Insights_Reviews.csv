@@ -1,0 +1,25 @@
+review_id,customer_id,product_id,review_date,rating,review_title,review_text,source_system
+V01,C01,P03,2026-02-01,5,Great coffee every morning,Easy to use and the coffee is great.,Review site
+V02,C01,P07,2026-06-12,1,Stopped charging,The left earbud stopped charging after two weeks.,Review site
+V03,C01,P12,2026-10-25,5,Quiet and strong,The air in my flat is much better.,Review site
+V04,C02,P01,2026-03-01,4,Comfortable,Good shoes. Delivery was slow.,Review site
+V05,C02,P07,2026-05-15,2,Keeps disconnecting,Sound is fine but the connection drops.,Review site
+V06,C02,P02,2026-07-10,5,Really waterproof,Kept me dry on a long hike.,Review site
+V07,C03,P09,2026-04-01,5,Works well once set up,"Setup took a while, then it worked well.",Review site
+V08,C03,P12,2026-09-15,4,Good purifier,Works well. It came late.,Review site
+V09,C04,P07,2026-04-25,1,Both stopped working,Both earbuds stopped working within a month.,Review site
+V10,C04,P06,2026-01-25,3,"Good TV, slow delivery",The picture is good but delivery took a week extra.,Review site
+V11,C05,P05,2026-07-05,4,Strong blender,Strong motor. The lid is tricky.,Review site
+V12,C06,P03,2026-03-10,4,"Great machine, damaged box",The machine is great. The box was damaged in transit.,Review site
+V13,C06,P04,2026-05-01,5,Good pods,Good taste and a fair price.,Review site
+V14,C07,P07,2026-08-08,2,One side only,Sound came from one ear only.,Review site
+V15,C07,P03,2026-06-01,4,Nice machine,Makes good coffee.,Review site
+V16,C08,P09,2026-02-10,4,Confusing setup,"Setup was confusing, but it works now.",Review site
+V17,C08,P12,2026-04-01,5,Very good,Quiet and the filter lasts long.,Review site
+V18,C08,P02,2026-09-01,4,Nice jacket,Good jacket after the size exchange.,Review site
+V19,C08,P07,2026-10-20,3,Battery is weak,Sound is OK but the battery is weak.,Review site
+V20,C09,P05,2026-09-22,2,Return was refused,"The blender is OK, but my return was refused.",Review site
+V21,C09,P07,2026-09-05,1,Will not charge,The earbuds will not charge at all.,Review site
+V22,C10,P06,2026-11-06,2,Second TV arrived cracked,My first TV was great. The second one arrived cracked.,Review site
+V23,C10,P03,2026-04-20,5,Best coffee machine,Excellent machine for the price.,Review site
+V24,C10,P09,2026-08-20,4,Great once connected,Great once the app connected.,Review site

@@ -1,0 +1,14 @@
+{
+  "required" : [ "customer" ],
+  "unevaluatedProperties" : false,
+  "properties" : {
+    "customer" : {
+      "title" : "Customer",
+      "description" : "The customer, for example 1, Customer 1 or C01",
+      "lightning:type" : "lightning__textType",
+      "lightning:isPII" : false,
+      "copilotAction:isUserInput" : false
+    }
+  },
+  "lightning:type" : "lightning__objectType"
+}

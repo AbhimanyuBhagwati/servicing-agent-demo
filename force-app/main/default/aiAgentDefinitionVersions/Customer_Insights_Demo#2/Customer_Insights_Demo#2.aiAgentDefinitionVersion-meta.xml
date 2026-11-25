@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<AiAgentDefinitionVersion xmlns="http://soap.sforce.com/2006/04/metadata">
+    <articleAnswersGPTEnabled>false</articleAnswersGPTEnabled>
+    <billingMode>ActionBased</billingMode>
+    <citationsEnabled>false</citationsEnabled>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The agent instructions</description>
+        <developerName>AgentScriptInternal_agent_instructions</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Agent Instructions</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <conversationVariables>
+        <dataType>Text</dataType>
+        <description>The next topic to be visited</description>
+        <developerName>AgentScriptInternal_next_topic</developerName>
+        <includeInPrompt>false</includeInPrompt>
+        <label>Next Topic</label>
+        <visibility>Internal</visibility>
+    </conversationVariables>
+    <copilotPrimaryLanguage>en_US</copilotPrimaryLanguage>
+    <genAiPlannerName>Customer_Insights_Demo_v2</genAiPlannerName>
+    <isScriptCompatibleAgent>true</isScriptCompatibleAgent>
+    <knowledgeActionEnabled>false</knowledgeActionEnabled>
+    <knowledgeFallbackEnabled>false</knowledgeFallbackEnabled>
+    <planner>
+        <fullName>Customer_Insights_Demo_v2</fullName>
+        <agentGraphRef>20Zfj00000CRIoL</agentGraphRef>
+        <description>Demo of an employee agent that answers questions about 10 test customers across eight Data 360 source tables (CRM, catalog, orders, tickets, returns, reviews, surveys). Invented test data.</description>
+        <localTopicLinks>
+            <genAiPluginName>agent_router</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>insights</genAiPluginName>
+        </localTopicLinks>
+        <localTopicLinks>
+            <genAiPluginName>off_topic</genAiPluginName>
+        </localTopicLinks>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Welcome the user and determine the appropriate subagent based on user input</description>
+            <genAiPluginInstructions>
+                <description>You are the Customer Insights agent of an invented online store, in a demo with invented test data. Staff of the store ask you about the 10 customers of the store (Customer 1 to Customer 10), their orders, the products, support tickets, returns, product reviews and survey answers.
+The data is in Data 360, in eight tables. Each table comes from a different source system of the store.
+Answer only from the results of your actions in this conversation. Never invent a customer, a product, a number, a date or a record. If a result has no rows, say that the data shows nothing for that question.
+Give names, counts and amounts exactly as the results show them. Use a short table or a list when you show more than three items.
+End each answer with one line that starts with &quot;Sources:&quot; and names the source systems that your actions used.</description>
+                <developerName>instruction0_179fj000004vL0d</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004vL0d</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>agent_router</localDeveloperName>
+            <masterLabel>Agent Router</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Answers questions about the store&apos;s 10 test customers, their orders, products, tickets, returns, reviews and surveys, from eight Data 360 tables.</description>
+            <genAiPluginInstructions>
+                <description>You are the Customer Insights agent of an invented online store, in a demo with invented test data. Staff of the store ask you about the 10 customers of the store (Customer 1 to Customer 10), their orders, the products, support tickets, returns, product reviews and survey answers.
+The data is in Data 360, in eight tables. Each table comes from a different source system of the store.
+Answer only from the results of your actions in this conversation. Never invent a customer, a product, a number, a date or a record. If a result has no rows, say that the data shows nothing for that question.
+Give names, counts and amounts exactly as the results show them. Use a short table or a list when you show more than three items.
+End each answer with one line that starts with &quot;Sources:&quot; and names the source systems that your actions used.</description>
+                <developerName>instruction0_179fj000004vL0c</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004vL0c</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localActionLinks>
+                <functionName>list_sources</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>run_query</functionName>
+            </localActionLinks>
+            <localActionLinks>
+                <functionName>customer_overview</functionName>
+            </localActionLinks>
+            <localActions>
+                <description>Reads everything about one customer from all source tables: the CRM record, the orders with products and deliveries, the tickets, the returns, the reviews and the survey answers.</description>
+                <invocationTarget>InsightsCustomerOverview</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>customer_overview</localDeveloperName>
+                <masterLabel>Customer Overview</masterLabel>
+            </localActions>
+            <localActions>
+                <description>Lists the eight source tables: the source system of each, the Data 360 table, what it holds, the number of rows and the time of the last load.</description>
+                <invocationTarget>InsightsListSources</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>list_sources</localDeveloperName>
+                <masterLabel>List Sources</masterLabel>
+            </localActions>
+            <localActions>
+                <description>Runs one Data 360 SQL SELECT statement on the eight Insights tables (read only) and gives back the rows as a text table, the source systems used and the SQL that ran.</description>
+                <invocationTarget>InsightsRunQuery</invocationTarget>
+                <invocationTargetType>apex</invocationTargetType>
+                <isConfirmationRequired>false</isConfirmationRequired>
+                <isIncludeInProgressIndicator>false</isIncludeInProgressIndicator>
+                <localDeveloperName>run_query</localDeveloperName>
+                <masterLabel>Run Query</masterLabel>
+            </localActions>
+            <localDeveloperName>insights</localDeveloperName>
+            <masterLabel>Customer Insights</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <localTopics>
+            <canEscalate>false</canEscalate>
+            <description>Redirect conversation to relevant topics when user request goes off-topic</description>
+            <genAiPluginInstructions>
+                <description>You are the Customer Insights agent of an invented online store, in a demo with invented test data. Staff of the store ask you about the 10 customers of the store (Customer 1 to Customer 10), their orders, the products, support tickets, returns, product reviews and survey answers.
+The data is in Data 360, in eight tables. Each table comes from a different source system of the store.
+Answer only from the results of your actions in this conversation. Never invent a customer, a product, a number, a date or a record. If a result has no rows, say that the data shows nothing for that question.
+Give names, counts and amounts exactly as the results show them. Use a short table or a list when you show more than three items.
+End each answer with one line that starts with &quot;Sources:&quot; and names the source systems that your actions used.</description>
+                <developerName>instruction0_179fj000004vL0b</developerName>
+                <language>en_US</language>
+                <masterLabel>instruction0_179fj000004vL0b</masterLabel>
+                <sortOrder>1</sortOrder>
+            </genAiPluginInstructions>
+            <language>en_US</language>
+            <localDeveloperName>off_topic</localDeveloperName>
+            <masterLabel>Off Topic</masterLabel>
+            <pluginType>Topic</pluginType>
+        </localTopics>
+        <masterLabel>Customer Insights (demo)</masterLabel>
+        <plannerType>Atlas__ConcurrentMultiAgentOrchestration</plannerType>
+    </planner>
+    <smallTalkEnabled>false</smallTalkEnabled>
+    <staticPromptsEnabled>false</staticPromptsEnabled>
+    <status>Inactive</status>
+    <stopRecPrompts>false</stopRecPrompts>
+    <surfacesEnabled>false</surfacesEnabled>
+    <toneType>Casual</toneType>
+    <version>2</version>
+    <welcomeMessage>Hello. I am the Customer Insights agent of this demo. Ask me about our 10 test customers: their orders, tickets, returns, reviews and survey answers. All data is invented.</welcomeMessage>
+</AiAgentDefinitionVersion>

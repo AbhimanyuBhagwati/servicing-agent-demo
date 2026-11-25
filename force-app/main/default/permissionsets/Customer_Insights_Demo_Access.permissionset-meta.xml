@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <classAccesses>
+        <apexClass>InsightsCustomerOverview</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>InsightsData360</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>InsightsListSources</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
+        <apexClass>InsightsRunQuery</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <description>Customer Insights (demo): access to the Apex classes of the insight actions. Assign it to each employee who uses the agent.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Customer Insights Demo Access</label>
+</PermissionSet>

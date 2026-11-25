@@ -1,0 +1,31 @@
+ticket_id,customer_id,order_id,product_id,opened_date,ticket_channel,ticket_category,subject,priority,ticket_status,resolved_date,resolution,csat_score,source_system
+T01,C01,O1003,P07,2026-06-10,Chat,Product defect,Left earbud does not charge,High,Resolved,2026-06-11,Return approved and refund issued,5,Help desk
+T02,C01,O1003,,2026-05-25,Email,Late delivery,Earbuds order is late,Medium,Resolved,2026-05-26,Delivered; apology and voucher,4,Help desk
+T03,C02,O1006,,2026-02-15,Email,Late delivery,Shoes and mat not delivered yet,Medium,Resolved,2026-02-16,Delivered; apology,3,Help desk
+T04,C02,O1007,P07,2026-05-12,Chat,Product defect,Earbuds keep disconnecting,High,Resolved,2026-05-14,Return approved and refund issued,4,Help desk
+T05,C03,O1010,P09,2026-03-15,Chat,How-to,Cannot pair thermostat with the app,Low,Resolved,2026-03-15,Sent the pairing steps,5,Help desk
+T06,C03,O1012,,2026-08-31,Email,Late delivery,Air purifier is three days late,Medium,Resolved,2026-09-01,Delivered; apology,3,Help desk
+T07,C04,O1013,,2026-01-13,Phone,Late delivery,TV not delivered after a week,High,Resolved,2026-01-20,Delivered after six days,2,Help desk
+T08,C04,O1015,P07,2026-04-20,Phone,Product defect,Both earbuds stopped working,High,Escalated,,,,Help desk
+T09,C04,O1016,P01,2026-05-18,Email,Wrong item,Wrong shoe size delivered,Medium,Open,,,,Help desk
+T10,C04,O1015,P07,2026-07-02,Phone,Refund question,Still waiting for the earbuds refund,High,Open,,,,Help desk
+T11,C05,O1018,,2026-07-31,Email,Billing,Charged for a cancelled order,Medium,Resolved,2026-08-02,Charge reversed,4,Help desk
+T12,C05,O1017,P05,2026-06-28,Chat,How-to,Blender lid does not lock,Low,Resolved,2026-06-28,Sent the lid steps,5,Help desk
+T13,C06,O1020,P03,2026-03-01,Email,Damaged item,"Box crushed, drip tray cracked",High,Resolved,2026-03-03,New drip tray sent,5,Help desk
+T14,C06,O1020,P03,2026-09-30,Chat,How-to,How to descale the coffee machine,Low,Resolved,2026-09-30,Sent the descaling guide,5,Help desk
+T15,C07,O1025,P07,2026-08-05,Chat,Product defect,Sound only in one ear,High,Resolved,2026-08-07,Return approved and refund issued,3,Help desk
+T16,C07,O1024,P03,2026-11-18,Email,How-to,Which pods fit my coffee machine,Low,Open,,,,Help desk
+T17,C08,O1026,P09,2026-02-03,Chat,How-to,Thermostat schedule does not save,Low,Resolved,2026-02-04,Firmware update steps sent,4,Help desk
+T18,C08,O1026,,2026-02-02,Email,Late delivery,Thermostat is late,Medium,Resolved,2026-02-03,Delivered; apology,3,Help desk
+T19,C08,O1029,P02,2026-08-20,Email,Wrong item,"Got size M, ordered L",Medium,Resolved,2026-08-24,Exchange by return,4,Help desk
+T20,C09,O1030,,2026-07-09,Phone,Late delivery,Blender five days late,Medium,Resolved,2026-07-12,Delivered; apology,2,Help desk
+T21,C09,O1030,P05,2026-09-20,Phone,Refund question,Why was my blender return rejected,Medium,Open,,,,Help desk
+T22,C09,O1031,P07,2026-09-02,Chat,Product defect,Earbuds will not charge,High,Escalated,,,,Help desk
+T23,C10,O1036,P09,2026-08-12,Chat,How-to,Thermostat app shows offline,Low,Resolved,2026-08-13,Wi-Fi reset steps sent,4,Help desk
+T24,C10,O1037,P06,2026-11-04,Phone,Damaged item,TV screen cracked on arrival,High,Escalated,,,,Help desk
+T25,C10,O1037,P06,2026-11-20,Email,Refund question,Waiting for the replacement TV,High,Open,,,,Help desk
+T26,C03,,,2026-10-15,Email,Billing,Discount code not applied,Low,Resolved,2026-10-16,Discount refunded,4,Help desk
+T27,C05,O1019,,2026-10-12,Chat,Order change,Change the delivery address,Low,Resolved,2026-10-12,Address changed,5,Help desk
+T28,C06,O1023,,2026-06-01,Email,Billing,Pods charged two times,Medium,Resolved,2026-06-03,Second charge reversed,4,Help desk
+T29,C02,O1009,P08,2026-09-20,Chat,How-to,Does the charger work with my phone,Low,Resolved,2026-09-20,Compatibility list sent,5,Help desk
+T30,C08,,P12,2026-11-22,Email,Product question,Is the air purifier filter in stock,Low,Open,,,,Help desk

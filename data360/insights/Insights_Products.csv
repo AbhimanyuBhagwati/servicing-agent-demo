@@ -1,0 +1,13 @@
+product_id,product_name,product_category,supplier,unit_price,source_system
+P01,Aero Running Shoes,Sportswear,StrideWorks,89.00,Product catalog
+P02,Trail Rain Jacket,Sportswear,StrideWorks,120.00,Product catalog
+P03,Barista Coffee Machine,Kitchen,BrewHaus,249.00,Product catalog
+P04,Coffee Pods 50 Pack,Kitchen,BrewHaus,22.00,Product catalog
+P05,Smart Blender,Kitchen,MixMaster,79.00,Product catalog
+P06,4K Smart TV 55 Inch,Electronics,Vistaline,649.00,Product catalog
+P07,Volt Wireless Earbuds,Electronics,SoundCo,59.00,Product catalog
+P08,Phone Fast Charger,Electronics,SoundCo,25.00,Product catalog
+P09,Smart Thermostat,Home,HomeWell,139.00,Product catalog
+P10,LED Desk Lamp,Home,Lumen and Co,35.00,Product catalog
+P11,Yoga Mat,Sportswear,StrideWorks,30.00,Product catalog
+P12,Air Purifier,Home,HomeWell,199.00,Product catalog
